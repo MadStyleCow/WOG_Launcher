@@ -1,0 +1,84 @@
+﻿<Page x:Class="UpdateClient.UI.Pages.Launcher"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="423" d:DesignWidth="770"
+	Title="LauncherPage">
+
+    <Grid Margin="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <GroupBox Header="Mods" Margin="0">
+            <ListBox x:Name="eMods" Margin="0"/>
+        </GroupBox>
+        <GroupBox Grid.Column="1" Header="Startup Options" Margin="0">
+            <Grid Margin="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="175*"/>
+                    <ColumnDefinition Width="283*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Skip splash screen" Margin="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+                <Label Content="Show script errors" Margin="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="1"/>
+                <Label Content="WinXP" Margin="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="2"/>
+                <Label Content="Window mode" Margin="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="3"/>
+                <Label Content="Empty world" Margin="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="4"/>
+                <Label Content="CPU Count" Margin="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="5"/>
+                <Label Content="Max Memory" Margin="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="7"/>
+                <Label Content="Additional parameters" Margin="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="11"/>
+                <Label Content="Connect automatically" Margin="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="12"/>
+                <Label Content="exThreads" Margin="0" HorizontalContentAlignment="Right" VerticalAlignment="Center" Grid.Row="9"/>
+                <CheckBox x:Name="eSkipIntro" Content="" Grid.Column="1" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <CheckBox x:Name="eShowScriptErrors" Content="" Grid.Column="1" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <CheckBox x:Name="eWinXP" Content="" Grid.Column="1" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <CheckBox x:Name="eWindowMode" Content="" Grid.Column="1" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <CheckBox x:Name="eEmptyWorld" Content="" Grid.Column="1" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <CheckBox x:Name="eConnect" Content="" Grid.Column="1" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Grid.Row="12" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <CheckBox x:Name="eCpuCountCheck" Content="" Grid.Column="1" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Grid.Row="5" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="eCpuCountCheck_Checked" Unchecked="eCpuCountCheck_Unchecked"/>
+                <CheckBox x:Name="eMaxMemoryCheck" Content="" Grid.Column="1" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Grid.Row="7" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="eMaxMemoryCheck_Checked" Unchecked="eMaxMemoryCheck_Unchecked"/>
+                <CheckBox x:Name="eExThreadsCheck" Content="" Grid.Column="1" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Grid.Row="9" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="eExThreadsCheck_Checked" Unchecked="eExThreadsCheck_Unchecked"/>
+                <ComboBox x:Name="eCpuCount" Grid.Column="1" Margin="10,5,5,5" Grid.Row="6" SelectedIndex="0" IsEnabled="False">
+                    <ComboBoxItem Content="1"/>
+                    <ComboBoxItem Content="2"/>
+                    <ComboBoxItem Content="3"/>
+                    <ComboBoxItem Content="4"/>
+                    <ComboBoxItem Content="5"/>
+                    <ComboBoxItem Content="6"/>
+                    <ComboBoxItem Content="7"/>
+                    <ComboBoxItem Content="8"/>
+                </ComboBox>
+                <ComboBox x:Name="eMaxMemory" Grid.Column="1" Margin="10,5,5,5" Grid.Row="8" SelectedIndex="0" IsEnabled="False">
+                    <ComboBoxItem Content="768"/>
+                    <ComboBoxItem Content="1024"/>
+                    <ComboBoxItem Content="2047"/>
+                </ComboBox>
+                <ComboBox x:Name="eExThreads" Grid.Column="1" Margin="10,5,5,5" Grid.Row="10" SelectedIndex="0" IsEnabled="False">
+                    <ComboBoxItem Content="0"/>
+                    <ComboBoxItem Content="1"/>
+                    <ComboBoxItem Content="3"/>
+                    <ComboBoxItem Content="5"/>
+                    <ComboBoxItem Content="7"/>
+                </ComboBox>
+                <TextBox x:Name="eAdditionalParameters" Grid.Column="1" Margin="10,5,5,5" Grid.Row="11"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Page>
