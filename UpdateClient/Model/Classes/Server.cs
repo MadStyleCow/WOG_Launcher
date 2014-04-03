@@ -65,7 +65,7 @@ namespace UpdateClient.Model.Classes
             try
             {
                 // Download files
-                Utilities.NetworkUtilities.DownloadFile(pManifestURL, ServerManifestTemp);
+                Utilities.NetworkUtilities.DownloadToFile(pManifestURL, ServerManifestTemp);
 
                 // Extract files
                 Utilities.FileUtilities.ExtractArchive(ServerManifestTemp, @"addons/Addons.xml", ServerAddonListTemp);

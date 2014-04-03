@@ -66,8 +66,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\Classes\ApplicationUpdate\ApplicationFile.cs" />
+    <Compile Include="Model\Classes\ApplicationUpdate\ApplicationManifest.cs" />
+    <Compile Include="Model\Enums\FileType.cs" />
     <Compile Include="Model\Utilities\Classes\SettingsCacheEntry.cs" />
+    <Compile Include="Model\Utilities\FileUtilities.cs" />
+    <Compile Include="Model\Utilities\NetworkUtilities.cs" />
     <Compile Include="Model\Utilities\SettingsCache.cs" />
+    <Compile Include="Model\Utilities\XMLSerializer.cs" />
     <Compile Include="UI\Pages\Browser.xaml.cs">
       <DependentUpon>Browser.xaml</DependentUpon>
     </Compile>
@@ -96,8 +102,8 @@
     <Compile Include="Model\Classes\Addon.cs" />
     <Compile Include="Model\Classes\Manifest.cs" />
     <Compile Include="Model\Classes\Mod.cs" />
-    <Compile Include="Model\Classes\Serializable\DSServerAddons.cs" />
-    <Compile Include="Model\Classes\Serializable\DSServerMods.cs" />
+    <Compile Include="Model\Classes\DSServer\DSServerAddons.cs" />
+    <Compile Include="Model\Classes\DSServer\DSServerMods.cs" />
     <Compile Include="Model\Classes\Server.cs" />
     <Compile Include="Model\Controllers\AppController.cs" />
     <Compile Include="Model\Enums\AppState.cs" />
@@ -106,9 +112,6 @@
     <Compile Include="Model\Utilities\Classes\FileCacheEntry.cs" />
     <Compile Include="Model\Utilities\Converters.cs" />
     <Compile Include="Model\Utilities\FileCache.cs" />
-    <Compile Include="Model\Utilities\FileUtilities.cs" />
-    <Compile Include="Model\Utilities\NetworkUtilities.cs" />
-    <Compile Include="Model\Utilities\XMLSerializer.cs" />
     <Compile Include="UI\Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

@@ -45,11 +45,8 @@ namespace ApplicationUpdate
                     NetworkUtilities.DownloadToString(Properties.Settings.Default.RemoteManifest).Result , typeof(ApplicationManifest));
                
                 // Initiate the update process.
-                foreach (ApplicationFile RemoteFile in RemoteManifest.ApplicationFileList)
+                foreach (ApplicationFile RemoteFile in RemoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.UPDATER)))
                 {
-                    // Check whether the file is supposed to be updated by the updater.
-                    if (RemoteFile.Type.Equals(FileType.UPDATER))
-                    {
                         // Check if the file is present in the local manifest
                         if (LocalManifest.ApplicationFileList.Any(p => p.ID.Equals(RemoteFile.ID)))
                         {
@@ -88,7 +85,6 @@ namespace ApplicationUpdate
                             Console.WriteLine("{0} [AppUpdate] -->> Downloading file '{1}'", DateTime.Now.ToString("HH:mm:ss"), RemoteFile.Path);
                             NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(RemoteFile.URL).Result, RemoteFile.Path).Wait();
                         }
-                    }
                 }
 
                 // Now check for the files that are present in the local manifest, but are not present in the remote manifest. 

@@ -38,7 +38,7 @@ namespace UpdateClient.Model.Classes
                     }
                     else
                     {
-                        String NewHash = FileUtilities.CalculateHash(RelativeAddonPath);
+                        String NewHash = FileUtilities.CalculateHash(RelativeAddonPath).Result;
                         FileCache.Instance.Update(RelativeAddonPath, NewHash, AddonFileInfo.LastWriteTimeUtc);
                         if (!pExtensions.Contains(AddonFileInfo.Extension.ToUpperInvariant()))
                             Status = (NewHash == Hash);
@@ -48,7 +48,7 @@ namespace UpdateClient.Model.Classes
                 }
                 else
                 {
-                    String NewHash = FileUtilities.CalculateHash(RelativeAddonPath);
+                    String NewHash = FileUtilities.CalculateHash(RelativeAddonPath).Result;
                     FileCache.Instance.Add(RelativeAddonPath, NewHash, AddonFileInfo.LastWriteTimeUtc);
                     if (!pExtensions.Contains(AddonFileInfo.Extension.ToUpperInvariant()))
                         Status = (NewHash == Hash);
@@ -71,7 +71,7 @@ namespace UpdateClient.Model.Classes
 
             try
             {
-                NetworkUtilities.DownloadFile(AbsoluteURL, TemporaryFile);
+                NetworkUtilities.DownloadToFile(AbsoluteURL, TemporaryFile);
                 FileUtilities.ExtractArchive(TemporaryFile, Name, String.Format("{0}\\{1}", RelativePath, Name));
                 return true;
             }

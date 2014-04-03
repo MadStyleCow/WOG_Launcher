@@ -26,9 +26,9 @@ namespace UpdateClient.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ftp://wogames.info/manifest.xml")]
-        public string ManifestURL {
+        public string ServerManifest {
             get {
-                return ((string)(this["ManifestURL"]));
+                return ((string)(this["ServerManifest"]));
             }
         }
         
@@ -80,6 +80,33 @@ namespace UpdateClient.Properties {
         public string SettingsCache {
             get {
                 return ((string)(this["SettingsCache"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ftp://arma2.wogames.info/appmanifest.xml")]
+        public string RemoteAppManfest {
+            get {
+                return ((string)(this["RemoteAppManfest"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources\\AppManifest.xml")]
+        public string LocalAppManifest {
+            get {
+                return ((string)(this["LocalAppManifest"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ApplicationUpdate.exe")]
+        public string ApplicationUpdateClient {
+            get {
+                return ((string)(this["ApplicationUpdateClient"]));
             }
         }
     }

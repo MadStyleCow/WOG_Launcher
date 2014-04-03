@@ -216,9 +216,62 @@ namespace UpdateClient.Model.Controllers
         /* Public Methods */
         public async Task InitializeController()
         {
-            ServerList = await Task.Run(() => GetServerList(Properties.Settings.Default.ManifestURL));
+            // Launch all of the asynchronous operations
+            Task<List<Server>> ServerListTask = Task.Run(() => GetServerList(Properties.Settings.Default.ServerManifest));
+            Task<ApplicationManifest> AppManifestTask = Task<ApplicationManifest>.Run<ApplicationManifest>(() =>
+                {
+                    return Task<String>.Run<String>(() => NetworkUtilities.DownloadToString(Properties.Settings.Default.RemoteAppManfest))
+                        .ContinueWith<ApplicationManifest>(t => (ApplicationManifest) XMLSerializer.XmlDeserializeFromString(t.Result, typeof(ApplicationManifest)));
+                });
 
-            SetServerList(ServerList);
+            // Check the application for updates
+            ApplicationManifest RemoteManifest = await AppManifestTask;
+
+            // Load the local manifest
+            ApplicationManifest LocalManifest = (ApplicationManifest) XMLSerializer.XmlDeserializeFromFile(Properties.Settings.Default.LocalAppManifest, typeof(ApplicationManifest));
+
+            if(!RemoteManifest.ManifestVersion.Equals(LocalManifest.ManifestVersion))
+            {
+                foreach(ApplicationFile RemoteFile in RemoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.APPLICATION)))
+                {
+                    if (LocalManifest.ApplicationFileList.Any(p => p.ID.Equals(RemoteFile.ID)))
+                    {
+                        ApplicationFile LocalFile = LocalManifest.ApplicationFileList.Find(p => p.ID.Equals(RemoteFile.ID));
+
+                        if (File.Exists(RemoteFile.Path))
+                        {
+                            if(!RemoteFile.Version.Equals(LocalFile.Version))
+                            {
+                                FileUtilities.DeleteFile(LocalFile.Path).Wait();
+                                NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(RemoteFile.URL).Result, RemoteFile.Path).Wait();
+                            }
+                        }
+                        else
+                        {
+                            NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(RemoteFile.URL).Result, RemoteFile.Path).Wait();
+                        }
+                    }
+                    else
+                    {
+                        NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(RemoteFile.URL).Result, RemoteFile.Path).Wait();
+                    }
+                }
+
+                // In any case, the application needs to be updated.
+                System.Windows.MessageBox.Show("Application requires an update.");
+
+                new Process()
+                {
+                    StartInfo = new ProcessStartInfo()
+                    {
+                         FileName = Properties.Settings.Default.ApplicationUpdateClient
+                    }
+                }.Start();
+
+                Environment.Exit(0);
+            }
+
+            SetServerList(await ServerListTask);
         }
 
         /* Private Methods */

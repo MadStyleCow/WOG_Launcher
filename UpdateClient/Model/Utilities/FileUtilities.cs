@@ -1,44 +1,77 @@
 ﻿using System;
 using System.IO;
-using System.Security.Cryptography;
 using System.IO.Compression;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace UpdateClient.Model.Utilities
 {
     public static class FileUtilities
     {
-        public static String CalculateHash(String pFilePath)
+        /// <summary>
+        /// Calculates the MD5 hash for the indicated file.
+        /// </summary>
+        /// <param name="pFilePath">File to be checked</param>
+        /// <returns>Hash sum of the file</returns>
+        public static async Task<String> CalculateHash(String pFilePath)
         {
-            using (MD5 md5 = MD5.Create())
+            try
             {
-                using (var stream = File.OpenRead(pFilePath))
+                using (MD5 md5 = MD5.Create())
                 {
-                   return BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToUpper();
+                    using (var stream = File.OpenRead(pFilePath))
+                    {
+                        return BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToUpper();
+                    }
                 }
+            }
+            catch(OperationCanceledException ex)
+            {
+                throw ex;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
         }
 
-        public static bool ExtractArchive(String pFilePath, String pEntry, String pOutput)
+        /// <summary>
+        /// Extracts the indicated entry from a ZIP archive and places it into an indicated place.
+        /// </summary>
+        /// <param name="pFilePath">Path to the ZIP archive</param>
+        /// <param name="pEntry">File to be extracted</param>
+        /// <param name="pOutput">Path to the result file</param>
+        /// <returns></returns>
+        public static async Task ExtractArchive(String pFilePath, String pEntry, String pOutput)
         {
             try
             {
                 if (!Directory.Exists(Path.GetDirectoryName(pOutput)))
+                {
                     Directory.CreateDirectory(Path.GetDirectoryName(pOutput));
+                }
 
                 using (FileStream Stream = File.OpenRead(pFilePath))
                 {
                     new ZipArchive(Stream).GetEntry(pEntry).ExtractToFile(pOutput, true);
                 }
-                return true;
+            }
+            catch(OperationCanceledException ex)
+            {
+                throw ex;
             }
             catch(Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
-                return false;
+                throw ex;
             }
         }
 
-        public static bool DeleteFile(String pFilePath)
+        /// <summary>
+        /// Attempts to delete an indicated record from the file system.
+        /// </summary>
+        /// <param name="pFilePath">Record to be deleted.</param>
+        /// <returns></returns>
+        public static async Task DeleteFile(String pFilePath)
         {
             try
             {
@@ -49,22 +82,34 @@ namespace UpdateClient.Model.Utilities
                     foreach (String file in Directory.GetFiles(pFilePath, "*", SearchOption.AllDirectories))
                     {
                         FileInfo info = new FileInfo(file);
-                        info.IsReadOnly = false;
+
+                        if (info.IsReadOnly)
+                        {
+                            info.IsReadOnly = false;
+                        }
                     }
                     Directory.Delete(pFilePath, true);
                 }
                 else
                 {
                     FileInfo info = new FileInfo(pFilePath);
-                    info.IsReadOnly = false;
+
+                    if (info.IsReadOnly)
+                    {
+                        info.IsReadOnly = false;
+                    }
+
                     File.Delete(pFilePath);
                 }
-                return true;
+
+            }
+            catch(OperationCanceledException ex)
+            {
+                throw ex;
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
-                return false;
+                throw ex;
             }
         }
     }
