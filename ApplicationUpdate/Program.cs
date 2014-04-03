@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ApplicationUpdate.Classes;
-using UtilityLibrary;
-using System.IO;
+﻿using ApplicationUpdate.Classes;
+using ApplicationUpdate.Enums;
+using ApplicationUpdate.Utilities;
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace ApplicationUpdate
 {
@@ -49,43 +47,47 @@ namespace ApplicationUpdate
                 // Initiate the update process.
                 foreach (ApplicationFile RemoteFile in RemoteManifest.ApplicationFileList)
                 {
-                    // Check if the file is present in the local manifest
-                    if(LocalManifest.ApplicationFileList.Any(p => p.ID.Equals(RemoteFile.ID)))
+                    // Check whether the file is supposed to be updated by the updater.
+                    if (RemoteFile.Type.Equals(FileType.UPDATER))
                     {
-                        ApplicationFile LocalFile = LocalManifest.ApplicationFileList.Find(p => p.ID.Equals(RemoteFile.ID));
-
-                        // There is a record of such file in a local manifest.
-                        if(File.Exists(RemoteFile.Path))
+                        // Check if the file is present in the local manifest
+                        if (LocalManifest.ApplicationFileList.Any(p => p.ID.Equals(RemoteFile.ID)))
                         {
-                            // Check to see whether the file version is the same in both manifests.
-                            if(RemoteFile.Version.Equals(LocalFile.Version))
+                            ApplicationFile LocalFile = LocalManifest.ApplicationFileList.Find(p => p.ID.Equals(RemoteFile.ID));
+
+                            // There is a record of such file in a local manifest.
+                            if (File.Exists(RemoteFile.Path))
                             {
-                                // The versions are the same.
-                                // Welp, nothing to do here...
+                                // Check to see whether the file version is the same in both manifests.
+                                if (RemoteFile.Version.Equals(LocalFile.Version))
+                                {
+                                    // The versions are the same.
+                                    // Welp, nothing to do here...
+                                }
+                                else
+                                {
+                                    // The versions are not the same.
+                                    Console.WriteLine("{0} [AppUpdate] -->> Replacing file '{1}'", DateTime.Now.ToString("HH:mm:ss"), RemoteFile.Path);
+                                    // Delete the local file.
+                                    FileUtilities.DeleteFile(LocalFile.Path).Wait();
+                                    // Download a new one in it's place.
+                                    NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(RemoteFile.URL).Result, RemoteFile.Path).Wait();
+                                }
                             }
                             else
                             {
-                                // The versions are not the same.
-                                Console.WriteLine("{0} [AppUpdate] -->> Replacing file '{1}'", DateTime.Now.ToString("HH:mm:ss"), RemoteFile.Path);
-                                // Delete the local file.
-                                FileUtilities.DeleteFile(LocalFile.Path).Wait();
-                                // Download a new one in it's place.
+                                // No such file is present, even though the manifest has a record regarding it.
+                                Console.WriteLine("{0} [AppUpdate] -->> Downloading file '{1}'", DateTime.Now.ToString("HH:mm:ss"), RemoteFile.Path);
                                 NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(RemoteFile.URL).Result, RemoteFile.Path).Wait();
                             }
                         }
                         else
                         {
-                            // No such file is present, even though the manifest has a record regarding it.
+                            // There is no such record in the local manifest
+                            // So it has to be downloaded in any case.
                             Console.WriteLine("{0} [AppUpdate] -->> Downloading file '{1}'", DateTime.Now.ToString("HH:mm:ss"), RemoteFile.Path);
                             NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(RemoteFile.URL).Result, RemoteFile.Path).Wait();
                         }
-                    }
-                    else
-                    {
-                        // There is no such record in the local manifest
-                        // So it has to be downloaded in any case.
-                        Console.WriteLine("{0} [AppUpdate] -->> Downloading file '{1}'", DateTime.Now.ToString("HH:mm:ss"), RemoteFile.Path);
-                        NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(RemoteFile.URL).Result, RemoteFile.Path).Wait();
                     }
                 }
 

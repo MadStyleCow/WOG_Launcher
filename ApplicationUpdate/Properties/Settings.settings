@@ -11,5 +11,8 @@
     <Setting Name="ApplicationPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">UpdateClient.exe</Value>
     </Setting>
+    <Setting Name="RetryAttempts" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

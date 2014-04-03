@@ -49,5 +49,14 @@ namespace ApplicationUpdate.Properties {
                 return ((string)(this["ApplicationPath"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int RetryAttempts {
+            get {
+                return ((int)(this["RetryAttempts"]));
+            }
+        }
     }
 }

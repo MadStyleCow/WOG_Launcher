@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateClient", "UpdateClien
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationUpdate", "ApplicationUpdate\ApplicationUpdate.csproj", "{1BD8B2B9-5552-4E0D-AD0A-A8C07E5B7286}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilityLibrary", "UtilityLibrary\UtilityLibrary.csproj", "{B427A008-F993-43CD-9A0D-3D8E00B182DA}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{1BD8B2B9-5552-4E0D-AD0A-A8C07E5B7286}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BD8B2B9-5552-4E0D-AD0A-A8C07E5B7286}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BD8B2B9-5552-4E0D-AD0A-A8C07E5B7286}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B427A008-F993-43CD-9A0D-3D8E00B182DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B427A008-F993-43CD-9A0D-3D8E00B182DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B427A008-F993-43CD-9A0D-3D8E00B182DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B427A008-F993-43CD-9A0D-3D8E00B182DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

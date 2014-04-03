@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace UtilityLibrary
+namespace ApplicationUpdate.Utilities
 {
     public static class NetworkUtilities
     {

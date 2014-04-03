@@ -10,6 +10,7 @@ namespace ApplicationUpdate.Classes
     public class ApplicationManifest
     {
         /* Fields */
+        public Int32 ManifestVersion { get; set; }
         public List<ApplicationFile> ApplicationFileList { get; set; }
 
         /* Constructors */
