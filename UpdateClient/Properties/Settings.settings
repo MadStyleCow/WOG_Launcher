@@ -2,10 +2,10 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="UpdateClient.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="ServerManifest" Type="System.String" Scope="Application">
+    <Setting Name="RemoteServerManifest" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ftp://wogames.info/manifest.xml</Value>
     </Setting>
-    <Setting Name="FileCache" Type="System.String" Scope="Application">
+    <Setting Name="LocalFileCache" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Resources\FileCache.xml</Value>
     </Setting>
     <Setting Name="RetryAttempts" Type="System.Int32" Scope="Application">
@@ -17,7 +17,7 @@
     <Setting Name="A3_Path" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="SettingsCache" Type="System.String" Scope="Application">
+    <Setting Name="LocalSettingsCache" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Resources\SettingsCache.xml</Value>
     </Setting>
     <Setting Name="RemoteAppManfest" Type="System.String" Scope="Application">

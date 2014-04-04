@@ -131,7 +131,7 @@ namespace UpdateClient.UI.Windows
                     eActionButton.IsEnabled = false;
                     eActionButton.Content = "Ponies!";
                     eProgressBar.Value = 0;
-                    eProgressLabel.Content = "Initializing the application";
+                    eProgressLabel.Content = "Checking the application for updates...";
                     break;
 
                 case AppState.CHECK:

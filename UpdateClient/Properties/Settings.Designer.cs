@@ -26,18 +26,18 @@ namespace UpdateClient.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ftp://wogames.info/manifest.xml")]
-        public string ServerManifest {
+        public string RemoteServerManifest {
             get {
-                return ((string)(this["ServerManifest"]));
+                return ((string)(this["RemoteServerManifest"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Resources\\FileCache.xml")]
-        public string FileCache {
+        public string LocalFileCache {
             get {
-                return ((string)(this["FileCache"]));
+                return ((string)(this["LocalFileCache"]));
             }
         }
         
@@ -77,9 +77,9 @@ namespace UpdateClient.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Resources\\SettingsCache.xml")]
-        public string SettingsCache {
+        public string LocalSettingsCache {
             get {
-                return ((string)(this["SettingsCache"]));
+                return ((string)(this["LocalSettingsCache"]));
             }
         }
         

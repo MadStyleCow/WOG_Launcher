@@ -11,7 +11,7 @@ namespace UpdateClient.Model.Utilities
     class SettingsCache
     {
          /* Static fields */
-        public static SettingsCache Instance = new SettingsCache(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), Properties.Settings.Default.SettingsCache);
+        public static SettingsCache Instance = new SettingsCache(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), Properties.Settings.Default.LocalSettingsCache);
 
         /* Private fields */
         SettingsCacheEntryList CacheEntryList;

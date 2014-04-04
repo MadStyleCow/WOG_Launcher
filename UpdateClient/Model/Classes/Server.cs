@@ -65,11 +65,11 @@ namespace UpdateClient.Model.Classes
             try
             {
                 // Download files
-                Utilities.NetworkUtilities.DownloadToFile(pManifestURL, ServerManifestTemp);
+                await Utilities.NetworkUtilities.DownloadToFile(pManifestURL, ServerManifestTemp);
 
                 // Extract files
-                Utilities.FileUtilities.ExtractArchive(ServerManifestTemp, @"addons/Addons.xml", ServerAddonListTemp);
-                Utilities.FileUtilities.ExtractArchive(ServerManifestTemp, @"addons/Mods.xml", ServerModListTemp);
+                await Utilities.FileUtilities.ExtractArchive(ServerManifestTemp, @"addons/Addons.xml", ServerAddonListTemp);
+                await Utilities.FileUtilities.ExtractArchive(ServerManifestTemp, @"addons/Mods.xml", ServerModListTemp);
 
                 // Serialize them
                 DSServer DSAddonServer = new DSServer()
@@ -173,8 +173,6 @@ namespace UpdateClient.Model.Classes
         public List<String> GetFileList()
         {
             // Set base directory
-            String wtf = GetBaseDirectory();
-
             Directory.SetCurrentDirectory(GetBaseDirectory());
 
             // Prepare

@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace ApplicationUpdate
 {
@@ -31,6 +32,13 @@ namespace ApplicationUpdate
                  * Optionally - it should check the hash for the file to guarantee cotinuity.
                  */
 
+                // Wait for the application to shutdown.
+                while(Process.GetProcesses().Any(p => p.StartInfo.FileName.Equals(Properties.Settings.Default.UpdateClient)))
+                {
+                    Thread.Sleep(1000);
+                    Console.WriteLine("{0} [AppUpdate] -->> Waiting for the update client to shut down...", DateTime.Now.ToString("HH:mm:ss"));
+                }
+
                 Console.WriteLine("{0} [AppUpdate] -->> Updating application files. Please stand by...", DateTime.Now.ToString("HH:mm:ss"));
 
                 // Due to the usage of relative paths, the working directory must be set to that of the application executable
@@ -45,7 +53,7 @@ namespace ApplicationUpdate
                     NetworkUtilities.DownloadToString(Properties.Settings.Default.RemoteManifest).Result , typeof(ApplicationManifest));
                
                 // Initiate the update process.
-                foreach (ApplicationFile RemoteFile in RemoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.UPDATER)))
+                foreach (ApplicationFile RemoteFile in RemoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.APPLICATION)))
                 {
                         // Check if the file is present in the local manifest
                         if (LocalManifest.ApplicationFileList.Any(p => p.ID.Equals(RemoteFile.ID)))
@@ -102,9 +110,6 @@ namespace ApplicationUpdate
                     }
                 }
 
-                // Save the remote manifest instead of a local one.
-                File.WriteAllText(Properties.Settings.Default.LocalManifest, RemoteManifest.XmlSerializeToString());
-
                 Console.WriteLine("{0} [AppUpdate] -->> Update complete.", DateTime.Now.ToString("HH:mm:ss"));
             }
             catch (Exception ex)
@@ -114,9 +119,6 @@ namespace ApplicationUpdate
             }
             finally
             {
-                Console.WriteLine("{0} [AppUpdate] -->> Press ENTER to continue.", DateTime.Now.ToString("HH:mm:ss"));
-                Console.ReadLine();
-
                 // Launch the updated application.
                 new Process() { StartInfo = new ProcessStartInfo(Properties.Settings.Default.ApplicationPath, String.Empty) }.Start();
             }

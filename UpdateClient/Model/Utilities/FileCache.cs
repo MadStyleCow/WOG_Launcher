@@ -25,10 +25,10 @@ namespace UpdateClient.Model.Utilities
             // Set the base directory
             Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
 
-            if (File.Exists(Properties.Settings.Default.FileCache))
+            if (File.Exists(Properties.Settings.Default.LocalFileCache))
             {
-                this.FileCacheLocation = Properties.Settings.Default.FileCache;
-                this.CacheEntryList = (FileCacheEntryList)XMLSerializer.XmlDeserializeFromFile(Properties.Settings.Default.FileCache, typeof(FileCacheEntryList));
+                this.FileCacheLocation = Properties.Settings.Default.LocalFileCache;
+                this.CacheEntryList = (FileCacheEntryList)XMLSerializer.XmlDeserializeFromFile(Properties.Settings.Default.LocalFileCache, typeof(FileCacheEntryList));
                 this.NewCacheEntryList = new FileCacheEntryList();
                 this.NewCacheEntryList.FileCacheEntries = new List<FileCacheEntry>(CacheEntryList.FileCacheEntries);
             }

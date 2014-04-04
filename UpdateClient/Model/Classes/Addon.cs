@@ -71,8 +71,8 @@ namespace UpdateClient.Model.Classes
 
             try
             {
-                NetworkUtilities.DownloadToFile(AbsoluteURL, TemporaryFile);
-                FileUtilities.ExtractArchive(TemporaryFile, Name, String.Format("{0}\\{1}", RelativePath, Name));
+                await NetworkUtilities.DownloadToFile(AbsoluteURL, TemporaryFile);
+                await FileUtilities.ExtractArchive(TemporaryFile, Name, String.Format("{0}\\{1}", RelativePath, Name));
                 return true;
             }
             catch(Exception ex)

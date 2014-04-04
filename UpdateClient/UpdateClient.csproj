@@ -162,6 +162,12 @@
   <ItemGroup>
     <Resource Include="Update.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ApplicationUpdate\ApplicationUpdate.csproj">
+      <Project>{1bd8b2b9-5552-4e0d-ad0a-a8c07e5b7286}</Project>
+      <Name>ApplicationUpdate</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

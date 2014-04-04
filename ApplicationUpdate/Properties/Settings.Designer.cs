@@ -58,5 +58,14 @@ namespace ApplicationUpdate.Properties {
                 return ((int)(this["RetryAttempts"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("UpdateClient.exe")]
+        public string UpdateClient {
+            get {
+                return ((string)(this["UpdateClient"]));
+            }
+        }
     }
 }

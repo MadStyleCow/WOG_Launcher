@@ -59,6 +59,7 @@ namespace UpdateClient.Model.Controllers
 
         private void SetServerList(List<Server> pValues)
         {
+
             List<String> Values = new List<string>();
 
             foreach(Server Value in pValues)
@@ -158,7 +159,7 @@ namespace UpdateClient.Model.Controllers
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
             FileCache.Instance.Write();
-            SettingsCache.Instance.Write(Properties.Settings.Default.SettingsCache);
+            SettingsCache.Instance.Write(Properties.Settings.Default.LocalSettingsCache);
         }
 
         public void GetSettings(SettingsCacheEntry pEntry)
@@ -216,8 +217,28 @@ namespace UpdateClient.Model.Controllers
         /* Public Methods */
         public async Task InitializeController()
         {
+            /*
+             * This place is reserved for any random crap which needs to be done in order to launch the damn thing
+             */
+
+            ApplicationManifest Manifest = new ApplicationManifest()
+            {
+                ManifestVersion = 1,
+                ApplicationFileList = new List<ApplicationFile>()
+                 {
+                     new ApplicationFile() 
+                    {
+                         ID = Guid.NewGuid(),
+                          Path = "ApplicationUpdate.exe", Type = FileType.UPDATER, Version = 1, URL = new List<string>() {"ftp://arma2.wogames.info/ARMA2/Utilities/UpdateClient/ApplicationUpdate.exe"}
+                    }
+                 }
+            };
+
+            Parent.Dispatcher.Invoke(() => System.Windows.Clipboard.SetText(Manifest.XmlSerializeToString()));
+
+
             // Launch all of the asynchronous operations
-            Task<List<Server>> ServerListTask = Task.Run(() => GetServerList(Properties.Settings.Default.ServerManifest));
+            Task<List<Server>> ServerListTask = Task.Run(() => GetServerList(Properties.Settings.Default.RemoteServerManifest));
             Task<ApplicationManifest> AppManifestTask = Task<ApplicationManifest>.Run<ApplicationManifest>(() =>
                 {
                     return Task<String>.Run<String>(() => NetworkUtilities.DownloadToString(Properties.Settings.Default.RemoteAppManfest))
@@ -232,7 +253,7 @@ namespace UpdateClient.Model.Controllers
 
             if(!RemoteManifest.ManifestVersion.Equals(LocalManifest.ManifestVersion))
             {
-                foreach(ApplicationFile RemoteFile in RemoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.APPLICATION)))
+                foreach(ApplicationFile RemoteFile in RemoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.UPDATER)))
                 {
                     if (LocalManifest.ApplicationFileList.Any(p => p.ID.Equals(RemoteFile.ID)))
                     {
@@ -271,7 +292,8 @@ namespace UpdateClient.Model.Controllers
                 Environment.Exit(0);
             }
 
-            SetServerList(await ServerListTask);
+            ServerList = await ServerListTask;
+            SetServerList(ServerList);
         }
 
         /* Private Methods */
