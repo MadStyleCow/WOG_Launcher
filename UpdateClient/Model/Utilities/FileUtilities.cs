@@ -8,6 +8,9 @@ namespace UpdateClient.Model.Utilities
 {
     public static class FileUtilities
     {
+        // Logger
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         /// <summary>
         /// Calculates the MD5 hash for the indicated file.
         /// </summary>
@@ -31,6 +34,7 @@ namespace UpdateClient.Model.Utilities
             }
             catch(Exception ex)
             {
+                log.Error(String.Format("Exception caught while trying to calculate hashsum for file '{0}'", pFilePath), ex);
                 throw ex;
             }
         }
@@ -62,6 +66,7 @@ namespace UpdateClient.Model.Utilities
             }
             catch(Exception ex)
             {
+                log.Error(String.Format("Exception caught while trying to extract file '{0}'", pFilePath), ex);
                 throw ex;
             }
         }
@@ -79,29 +84,20 @@ namespace UpdateClient.Model.Utilities
 
                 if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
                 {
-                    foreach (String file in Directory.GetFiles(pFilePath, "*", SearchOption.AllDirectories))
-                    {
-                        FileInfo info = new FileInfo(file);
-
-                        if (info.IsReadOnly)
-                        {
-                            info.IsReadOnly = false;
-                        }
-                    }
-                    Directory.Delete(pFilePath, true);
+                    DirectoryInfo info = new DirectoryInfo(pFilePath);
+                    info.Attributes &= ~FileAttributes.ReadOnly;
+                    info.Refresh();
+                    info.Delete(true);
+                    return;
                 }
                 else
                 {
                     FileInfo info = new FileInfo(pFilePath);
-
-                    if (info.IsReadOnly)
-                    {
-                        info.IsReadOnly = false;
-                    }
-
-                    File.Delete(pFilePath);
+                    info.Attributes &= ~FileAttributes.ReadOnly;
+                    info.Refresh();
+                    info.Delete();
+                    return;
                 }
-
             }
             catch(OperationCanceledException ex)
             {
@@ -109,6 +105,7 @@ namespace UpdateClient.Model.Utilities
             }
             catch (Exception ex)
             {
+                log.Error(String.Format("Exception caught while trying to delete file '{0}'", pFilePath), ex);
                 throw ex;
             }
         }

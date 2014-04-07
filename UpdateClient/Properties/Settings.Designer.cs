@@ -25,7 +25,7 @@ namespace UpdateClient.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ftp://wogames.info/manifest.xml")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ftp://arma2.wogames.info/manifest.xml")]
         public string RemoteServerManifest {
             get {
                 return ((string)(this["RemoteServerManifest"]));

@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using log4net;
+using log4net.Config;
 
 namespace ApplicationUpdate
 {
@@ -14,10 +16,14 @@ namespace ApplicationUpdate
         /*
          * Purpose of this application is to update the main UpdateClient, when any changes to files are required.   
          */
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [STAThread]
         static void Main(string[] args)
         {
+            // Configure the logger
+            log4net.Config.XmlConfigurator.Configure();
+
             /* Fields */
             ApplicationManifest RemoteManifest;
             ApplicationManifest LocalManifest;
@@ -51,7 +57,7 @@ namespace ApplicationUpdate
                 // Download the remote manifest
                 RemoteManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromString(
                     NetworkUtilities.DownloadToString(Properties.Settings.Default.RemoteManifest).Result , typeof(ApplicationManifest));
-               
+
                 // Initiate the update process.
                 foreach (ApplicationFile RemoteFile in RemoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.APPLICATION)))
                 {
@@ -111,16 +117,21 @@ namespace ApplicationUpdate
                 }
 
                 Console.WriteLine("{0} [AppUpdate] -->> Update complete.", DateTime.Now.ToString("HH:mm:ss"));
+
+                // Launch the updated application.
+                 new Process() { StartInfo = new ProcessStartInfo(Properties.Settings.Default.ApplicationPath, String.Empty) }.Start();
             }
             catch (Exception ex)
             {
+                Console.WriteLine("{0} [AppUpdate] -->> A fatal exception occured.", DateTime.Now.ToString("HH:mm:ss"));
+                Console.WriteLine("{0} [AppUpdate] -->> Please submit the log file to the creator.", DateTime.Now.ToString("HH:mm:ss"));
+                Console.WriteLine("{0} [AppUpdate] -->> Log file can be found in the 'Logs' directory.", DateTime.Now.ToString("HH:mm:ss"));
+                Console.WriteLine("============= EXCEPTION ===============");
                 Console.WriteLine(ex.ToString());
-                // Should be logged.
-            }
-            finally
-            {
-                // Launch the updated application.
-                new Process() { StartInfo = new ProcessStartInfo(Properties.Settings.Default.ApplicationPath, String.Empty) }.Start();
+                log.Fatal("Fatal exception occured", ex);
+                Console.WriteLine("============= EXCEPTION ===============");
+                Console.WriteLine("{0} [AppUpdate] -->> Press ENTER to close the application.", DateTime.Now.ToString("HH:mm:ss"));
+                Console.ReadLine();
             }
         }
     }

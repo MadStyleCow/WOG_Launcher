@@ -16,7 +16,6 @@ namespace UpdateClient.Model.Utilities
 
         /* Private fields */
         FileCacheEntryList CacheEntryList;
-        FileCacheEntryList NewCacheEntryList;
         String FileCacheLocation;
 
         /* Constructors */
@@ -29,32 +28,79 @@ namespace UpdateClient.Model.Utilities
             {
                 this.FileCacheLocation = Properties.Settings.Default.LocalFileCache;
                 this.CacheEntryList = (FileCacheEntryList)XMLSerializer.XmlDeserializeFromFile(Properties.Settings.Default.LocalFileCache, typeof(FileCacheEntryList));
-                this.NewCacheEntryList = new FileCacheEntryList();
-                this.NewCacheEntryList.FileCacheEntries = new List<FileCacheEntry>(CacheEntryList.FileCacheEntries);
             }
         }
 
         /* Methods */
         public bool Contains(String pPath)
         {
-            return CacheEntryList.FileCacheEntries.Any(p => p.Path == pPath);
+            try
+            {
+                int Index = 0;
+                while(Index < CacheEntryList.FileCacheEntries.Count)
+                {
+                    if (CacheEntryList.FileCacheEntries[Index].Path.Equals(pPath))
+                    {
+                        return true;
+                    }
+                    Index++;
+                }
+                return false;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public FileCacheEntry Get(String pPath)
         {
-            return CacheEntryList.FileCacheEntries.Find(p => p.Path == pPath);
+            try
+            {
+                // Use while instead of foreach / extensions as those are mutable
+                int Index = 0;
+                while (Index < CacheEntryList.FileCacheEntries.Count)
+                {
+                    if (CacheEntryList.FileCacheEntries[Index].Path.Equals(pPath))
+                    {
+                        return CacheEntryList.FileCacheEntries[Index];
+                    }
+                    Index++;
+                }
+                throw new ApplicationException("No such path found");
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public void Update(String pPath, String pHash, DateTime pLastWrite)
         {
-            FileCacheEntry Entry = CacheEntryList.FileCacheEntries.Find(p => p.Path == pPath);
-            Entry.Hash = pHash;
-            Entry.LastWrite = pLastWrite;
+            try
+            {
+                // Use while instead of foreach / extensions as those are mutable
+                int Index = 0;
+                while (Index < CacheEntryList.FileCacheEntries.Count)
+                {
+                    if (CacheEntryList.FileCacheEntries[Index].Path.Equals(pPath))
+                    {
+                        CacheEntryList.FileCacheEntries[Index].Hash = pHash;
+                        CacheEntryList.FileCacheEntries[Index].LastWrite = pLastWrite;
+                        break;
+                    }
+                    Index++;
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public void Add(String pPath, String pHash, DateTime pLastWrite)
         {
-            NewCacheEntryList.FileCacheEntries.Add(new FileCacheEntry() { Path = pPath, Hash = pHash, LastWrite = pLastWrite });
+            CacheEntryList.FileCacheEntries.Add(new FileCacheEntry() { Path = pPath, Hash = pHash, LastWrite = pLastWrite });
         }
 
         public void Write()
@@ -63,7 +109,7 @@ namespace UpdateClient.Model.Utilities
             Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
 
             // Write the file.
-            File.WriteAllText(FileCacheLocation, NewCacheEntryList.XmlSerializeToString());
+            File.WriteAllText(FileCacheLocation, CacheEntryList.XmlSerializeToString());
         }
     }
 }

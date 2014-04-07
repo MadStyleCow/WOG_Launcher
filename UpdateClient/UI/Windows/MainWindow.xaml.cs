@@ -16,6 +16,8 @@ using UpdateClient.Model.Controllers;
 using UpdateClient.Model.Enums;
 using UpdateClient.Model.Utilities.Classes;
 using UpdateClient.UI.Pages;
+using log4net;
+using log4net.Config;
 
 namespace UpdateClient.UI.Windows
 {

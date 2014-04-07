@@ -59,7 +59,6 @@ namespace UpdateClient.Model.Controllers
 
         private void SetServerList(List<Server> pValues)
         {
-
             List<String> Values = new List<string>();
 
             foreach(Server Value in pValues)
@@ -137,21 +136,28 @@ namespace UpdateClient.Model.Controllers
 
         public void ServerSelected(String pSelectedServer)
         {
-            CurrentServer = ServerList.Find(p => p.Name == pSelectedServer);
+            try
+            {
+                CurrentServer = ServerList.Find(p => p.Name == pSelectedServer);
 
-            if (CurrentServer.UpToDate())
-            {
-                // All's well
-                ApplicationState = AppState.PLAY;
-                SetUIState(AppState.PLAY);
+                if (CurrentServer.UpToDate())
+                {
+                    // All's well
+                    ApplicationState = AppState.PLAY;
+                    SetUIState(AppState.PLAY);
+                }
+                else
+                {
+                    // All's not well
+                    // Display update frame
+                    ApplicationState = AppState.CHECK;
+                    SetUIState(AppState.CHECK);
+                    SetBrowserTarget(CurrentServer.GetChangelogURL().Result);
+                }
             }
-            else
+            catch(Exception ex)
             {
-                // All's not well
-                // Display update frame
-                ApplicationState = AppState.CHECK;
-                SetUIState(AppState.CHECK);
-                SetBrowserTarget(CurrentServer.GetChangelogURL().Result);
+                System.Windows.MessageBox.Show(ex.ToString());
             }
         }
 
@@ -217,28 +223,9 @@ namespace UpdateClient.Model.Controllers
         /* Public Methods */
         public async Task InitializeController()
         {
-            /*
-             * This place is reserved for any random crap which needs to be done in order to launch the damn thing
-             */
-
-            ApplicationManifest Manifest = new ApplicationManifest()
-            {
-                ManifestVersion = 1,
-                ApplicationFileList = new List<ApplicationFile>()
-                 {
-                     new ApplicationFile() 
-                    {
-                         ID = Guid.NewGuid(),
-                          Path = "ApplicationUpdate.exe", Type = FileType.UPDATER, Version = 1, URL = new List<string>() {"ftp://arma2.wogames.info/ARMA2/Utilities/UpdateClient/ApplicationUpdate.exe"}
-                    }
-                 }
-            };
-
-            Parent.Dispatcher.Invoke(() => System.Windows.Clipboard.SetText(Manifest.XmlSerializeToString()));
-
-
             // Launch all of the asynchronous operations
             Task<List<Server>> ServerListTask = Task.Run(() => GetServerList(Properties.Settings.Default.RemoteServerManifest));
+
             Task<ApplicationManifest> AppManifestTask = Task<ApplicationManifest>.Run<ApplicationManifest>(() =>
                 {
                     return Task<String>.Run<String>(() => NetworkUtilities.DownloadToString(Properties.Settings.Default.RemoteAppManfest))
@@ -315,37 +302,34 @@ namespace UpdateClient.Model.Controllers
         {
             try
             {
-                // Get manifest
+                // Set UI state to CANCELCHECK
+                ApplicationState = AppState.CANCELCHECK;
+                SetUIState(AppState.CANCELCHECK);
+
+                // Receive manifests if needed.
                 if (CurrentServer.BaseManifestURL == null)
                 {
-                    CurrentServer.BaseManifestURL = Task.Run(() => CurrentServer.GetManifestURL(), TokenSource.Token).Result;
-
-                    // Get addon and mod lists
-                    await Task.Run(() => CurrentServer.GetAddonList(CurrentServer.BaseManifestURL), TokenSource.Token);
+                    CurrentServer.BaseManifestURL = await CurrentServer.GetManifestURL();
+                    await CurrentServer.GetAddonList(CurrentServer.BaseManifestURL);
                 }
 
                 // Go through each file and check whether it is present
                 Int32 Counter = 0;
 
-                FileCache.Instance = new FileCache();
-
-                Task.Factory.StartNew(() =>
+                Parallel.ForEach(CurrentServer.AddonList, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount }, async file =>
                 {
-                    ApplicationState = AppState.CANCELCHECK;
-                    SetUIState(AppState.CANCELCHECK);
+                    // Check the status of the addon
+                    await file.CheckAddon(CurrentServer.GetBaseDirectory(), CurrentServer.ConfigExtensionList);
 
-                    Parallel.ForEach(CurrentServer.AddonList, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount }, file =>
+                    // Update the counter
+                    Counter++;
+
+                    // Inform the UI
+                    if (!TokenSource.IsCancellationRequested)
                     {
-                        Task<Boolean>.Run(() => file.CheckAddon(CurrentServer.GetBaseDirectory(), CurrentServer.ConfigExtensionList), TokenSource.Token).Wait();
-
-                        Counter++;
-
-                        // Inform the UI
-                        if(!TokenSource.IsCancellationRequested)
-                            this.SetProgress(Counter * (100f / CurrentServer.AddonList.Count), String.Format("Checked {0} of {1} addons.", Counter, CurrentServer.AddonList.Count));
-                    });
-
-                    FileCache.Instance.Write();
+                        this.SetProgress(Counter * (100f / CurrentServer.AddonList.Count), String.Format("Checked {0} of {1} addons.", Counter, CurrentServer.AddonList.Count));
+                    }
+                });
 
                     this.SetProgress(100f, "Searching for files to delete...");
 
@@ -364,7 +348,6 @@ namespace UpdateClient.Model.Controllers
                         this.ApplicationState = AppState.PLAY;
                         SetUIState(AppState.PLAY);
                     }
-                }, TokenSource.Token);
             }
             catch (Exception ex)
             {
@@ -376,7 +359,7 @@ namespace UpdateClient.Model.Controllers
         {
             try
             {
-                Task.Factory.StartNew(() =>
+                Task.Factory.StartNew(async () =>
                 {
                     this.ApplicationState = AppState.CANCELUPDATE;
                     SetUIState(AppState.CANCELUPDATE);
@@ -397,10 +380,12 @@ namespace UpdateClient.Model.Controllers
                     this.SetProgress(100f, "Deleting files...");
                     
                     // File deletion
-                    foreach(String File in CurrentServer.FileList)
+                    foreach(String Entry in CurrentServer.FileList)
                     {
-                        if(System.IO.File.Exists(File))
-                            FileUtilities.DeleteFile(File);
+                        if (Directory.Exists(Entry) || File.Exists(Entry))
+                        {
+                            await FileUtilities.DeleteFile(Entry);
+                        }
                     }
 
                     // Re-check all of the addons.
