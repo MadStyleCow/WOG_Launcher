@@ -429,7 +429,6 @@ namespace UpdateClient.Model.Controllers
                         this.ApplicationState = AppState.UPDATE;
                         SetUIState(AppState.UPDATE);
 
-
                         this.SetProgress(100f, String.Format("{0} files will be updated, {1} files will be deleted...", CurrentServer.AddonList.Count(p => !p.Status), CurrentServer.FileList.Count));
                     }
                     else
@@ -454,17 +453,22 @@ namespace UpdateClient.Model.Controllers
                 SetUIState(AppState.CANCELUPDATE);
 
                 Int32 Counter = 0;
+                List<Addon> AddonsToDownload = CurrentServer.AddonList.FindAll(p => !p.Status);
 
-                Parallel.ForEach(CurrentServer.AddonList.FindAll(p => !p.Status), new ParallelOptions() { MaxDegreeOfParallelism = CurrentServer.ThreadCount, CancellationToken = TokenSource.Token }, file =>
+                Parallel.ForEach(AddonsToDownload, new ParallelOptions() { MaxDegreeOfParallelism = CurrentServer.ThreadCount, CancellationToken = TokenSource.Token }, file =>
                 {
+                    // Download the file.
                     file.UpdateAddon(CurrentServer.GetBaseDirectory()).Wait();
 
+                    // And then check it
+                    file.CheckAddon(CurrentServer.GetBaseDirectory(), CurrentServer.ConfigExtensionList).Wait();
+                    
                     Counter++;
 
                     // Inform the UI
                     if (!TokenSource.IsCancellationRequested)
                     {
-                        this.SetProgress(Counter * (100f / CurrentServer.AddonList.Count(p => !p.Status)), String.Format("Updated {0} of {1} addons.", Counter, CurrentServer.AddonList.Count(p => !p.Status)));
+                        this.SetProgress(Counter * (100f / AddonsToDownload.Count), String.Format("Updated {0} of {1} addons.", Counter, AddonsToDownload.Count));
                     }
                 });
 
