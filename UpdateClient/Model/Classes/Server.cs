@@ -35,27 +35,6 @@ namespace UpdateClient.Model.Classes
         public String BaseManifestURL;
 
         /* Public methods */
-        public async Task<string> GetManifestURL()
-        {
-            List<string> AvailableURL = new List<string>();
-            Random RandomGenerator = new Random();
-
-            foreach (string ManifestURL in ManifestURLList)
-            {
-                FtpWebRequest CheckManifestURL = (FtpWebRequest)WebRequest.Create(ManifestURL);
-                CheckManifestURL.Method = WebRequestMethods.Ftp.GetFileSize;
-                FtpWebResponse CheckManifestURLResponse = (FtpWebResponse)CheckManifestURL.GetResponse();
-
-                if (CheckManifestURLResponse.StatusCode == FtpStatusCode.FileStatus)
-                {
-                    AvailableURL.Add(ManifestURL);
-                }
-
-                CheckManifestURLResponse.Close();
-            }
-            return AvailableURL[RandomGenerator.Next(0, AvailableURL.Count)];
-        }
-
         public async Task GetAddonList(String pManifestURL)
         {
             String ServerManifestTemp = Path.GetTempFileName();
@@ -128,33 +107,6 @@ namespace UpdateClient.Model.Classes
                     return Properties.Settings.Default.A3_Path;
                 default:
                     throw new NotImplementedException();
-            }
-        }
-
-        public async Task<String> GetChangelogURL()
-        {
-            try
-            {
-                List<string> AvailableURL = new List<string>();
-                Random RandomGenerator = new Random();
-
-                foreach (string ChangelogURL in ChangelogURLList)
-                {
-                    HttpWebRequest CheckChangelogURL = (HttpWebRequest)WebRequest.Create(ChangelogURL);
-                    HttpWebResponse CheckChangelogURLResponse = (HttpWebResponse)CheckChangelogURL.GetResponse();
-
-                    if (CheckChangelogURLResponse.StatusCode == HttpStatusCode.OK)
-                    {
-                        AvailableURL.Add(ChangelogURL);
-                    }
-
-                    CheckChangelogURLResponse.Close();
-                }
-                return AvailableURL[RandomGenerator.Next(0, AvailableURL.Count)];
-            }
-            catch(Exception)
-            {
-                return "http://www.wogames.info";
             }
         }
 

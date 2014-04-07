@@ -15,7 +15,6 @@ namespace UpdateClient.Model.Utilities
 
         /* Private fields */
         SettingsCacheEntryList CacheEntryList;
-        SettingsCacheEntryList NewCacheEntryList;
         String SettingsCacheLocation;
 
         /* Constructors */
@@ -28,35 +27,87 @@ namespace UpdateClient.Model.Utilities
             {
                 this.SettingsCacheLocation = pSettingsCacheLocation;
                 this.CacheEntryList = (SettingsCacheEntryList)XMLSerializer.XmlDeserializeFromFile(SettingsCacheLocation, typeof(SettingsCacheEntryList));
-                this.NewCacheEntryList = new SettingsCacheEntryList();
-                this.NewCacheEntryList.SettingsCacheEntries = new List<SettingsCacheEntry>(CacheEntryList.SettingsCacheEntries);
             }
         }
 
         /* Methods */
         public bool Contains(Guid pIdKey)
         {
-            return CacheEntryList.SettingsCacheEntries.Any(p => p.ServerIdKey == pIdKey);
+            try
+            {
+                int Index = 0;
+                while (Index < CacheEntryList.SettingsCacheEntries.Count)
+                {
+                    if (CacheEntryList.SettingsCacheEntries[Index].ServerIdKey.Equals(pIdKey))
+                    {
+                        return true;
+                    }
+                    Index++;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public SettingsCacheEntry Get(Guid pIdKey)
         {
-            return CacheEntryList.SettingsCacheEntries.Find(p => p.ServerIdKey == pIdKey);
+            try
+            {
+                // Use while instead of foreach / extensions as those are mutable
+                int Index = 0;
+                while (Index < CacheEntryList.SettingsCacheEntries.Count)
+                {
+                    if (CacheEntryList.SettingsCacheEntries[Index].ServerIdKey.Equals(pIdKey))
+                    {
+                        return CacheEntryList.SettingsCacheEntries[Index];
+                    }
+                    Index++;
+                }
+                throw new ApplicationException("No such id key found");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public void Update(Guid pIdKey, SettingsCacheEntry pEntry)
         {
-            CacheEntryList.SettingsCacheEntries[CacheEntryList.SettingsCacheEntries.FindIndex(p => p.ServerIdKey == pIdKey)] = pEntry;
+            try
+            {
+                // Use while instead of foreach / extensions as those are mutable
+                int Index = 0;
+                while (Index < CacheEntryList.SettingsCacheEntries.Count)
+                {
+                    if (CacheEntryList.SettingsCacheEntries[Index].ServerIdKey.Equals(pIdKey))
+                    {
+                        CacheEntryList.SettingsCacheEntries[Index] = pEntry;
+                        break;
+                    }
+                    Index++;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         
         public void Add(SettingsCacheEntry pEntry)
         {
-            NewCacheEntryList.SettingsCacheEntries.Add(pEntry);
+            CacheEntryList.SettingsCacheEntries.Add(pEntry);
         }
 
-        public void Write(String pPath)
+        public void Write()
         {
-            File.WriteAllText(pPath, NewCacheEntryList.XmlSerializeToString());
+            // Set the directory
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
+
+            // Write the file
+            File.WriteAllText(SettingsCacheLocation, CacheEntryList.XmlSerializeToString());
         }
     }
 }

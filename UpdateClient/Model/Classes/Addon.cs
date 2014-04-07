@@ -18,52 +18,57 @@ namespace UpdateClient.Model.Classes
         public Boolean Status;           // Indicates whether the file is correct and has already been updated or does not require an update.
 
         /* Public methods */
-        public async Task<Boolean> CheckAddon(String pBaseDirectory, List<String> pExtensions)
+        public async Task CheckAddon(String pBaseDirectory, List<String> pExtensions)
         {
-            Directory.SetCurrentDirectory(pBaseDirectory);
-
-            String RelativeAddonPath = String.Format("{0}\\{1}", RelativePath, Name);
-
-            if (File.Exists(RelativeAddonPath))
+            try
             {
-                FileInfo AddonFileInfo = new FileInfo(RelativeAddonPath);
-                if (FileCache.Instance.Contains(RelativeAddonPath))
+                Directory.SetCurrentDirectory(pBaseDirectory);
+
+                String RelativeAddonPath = String.Format("{0}\\{1}", RelativePath, Name);
+
+                if (File.Exists(RelativeAddonPath))
                 {
-                    if (AddonFileInfo.LastWriteTimeUtc == FileCache.Instance.Get(RelativeAddonPath).LastWrite)
+                    FileInfo AddonFileInfo = new FileInfo(RelativeAddonPath);
+                    if (FileCache.Instance.Contains(RelativeAddonPath))
                     {
-                        if (!pExtensions.Contains(AddonFileInfo.Extension.ToUpperInvariant()))
-                            Status = (FileCache.Instance.Get(RelativeAddonPath).Hash == Hash);
+                        if (AddonFileInfo.LastWriteTimeUtc == FileCache.Instance.Get(RelativeAddonPath).LastWrite)
+                        {
+                            if (!pExtensions.Contains(AddonFileInfo.Extension.ToUpperInvariant()))
+                                Status = (FileCache.Instance.Get(RelativeAddonPath).Hash == Hash);
+                            else
+                                Status = true;
+                        }
                         else
-                            Status = true;
+                        {
+                            String NewHash = FileUtilities.CalculateHash(RelativeAddonPath).Result;
+                            FileCache.Instance.Update(RelativeAddonPath, NewHash, AddonFileInfo.LastWriteTimeUtc);
+                            if (!pExtensions.Contains(AddonFileInfo.Extension.ToUpperInvariant()))
+                                Status = (NewHash == Hash);
+                            else
+                                Status = true;
+                        }
                     }
                     else
                     {
                         String NewHash = FileUtilities.CalculateHash(RelativeAddonPath).Result;
-                        FileCache.Instance.Update(RelativeAddonPath, NewHash, AddonFileInfo.LastWriteTimeUtc);
+                        FileCache.Instance.Add(RelativeAddonPath, NewHash, AddonFileInfo.LastWriteTimeUtc);
                         if (!pExtensions.Contains(AddonFileInfo.Extension.ToUpperInvariant()))
                             Status = (NewHash == Hash);
-                        else
-                            Status = true;
+                        else Status = true;
                     }
                 }
                 else
                 {
-                    String NewHash = FileUtilities.CalculateHash(RelativeAddonPath).Result;
-                    FileCache.Instance.Add(RelativeAddonPath, NewHash, AddonFileInfo.LastWriteTimeUtc);
-                    if (!pExtensions.Contains(AddonFileInfo.Extension.ToUpperInvariant()))
-                        Status = (NewHash == Hash);
-                    else Status = true;
+                    Status = false;
                 }
             }
-            else
+            catch (Exception)
             {
-                Status = false;
+                throw;
             }
-
-            return Status;
         }
 
-        public async Task<Boolean> UpdateAddon(String pBaseDirectory)
+        public async Task UpdateAddon(String pBaseDirectory)
         {
             Directory.SetCurrentDirectory(pBaseDirectory);
 
@@ -73,12 +78,10 @@ namespace UpdateClient.Model.Classes
             {
                 await NetworkUtilities.DownloadToFile(AbsoluteURL, TemporaryFile);
                 await FileUtilities.ExtractArchive(TemporaryFile, Name, String.Format("{0}\\{1}", RelativePath, Name));
-                return true;
             }
-            catch(Exception ex)
+            catch(Exception)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
-                return false;
+                throw;
             }
             finally
             {
