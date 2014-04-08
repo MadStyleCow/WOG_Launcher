@@ -39,7 +39,7 @@ namespace ApplicationUpdate
                  */
 
                 // Wait for the application to shutdown.
-                while(Process.GetProcesses().Any(p => p.StartInfo.FileName.Equals(Properties.Settings.Default.UpdateClient)))
+                while(Process.GetProcesses().Any(p => p.StartInfo.FileName.Equals(Properties.Settings.Default.UpdateClientProcessName)))
                 {
                     Thread.Sleep(1000);
                     Console.WriteLine("{0} [AppUpdate] -->> Waiting for the update client to shut down...", DateTime.Now.ToString("HH:mm:ss"));
@@ -119,7 +119,7 @@ namespace ApplicationUpdate
                 Console.WriteLine("{0} [AppUpdate] -->> Update complete.", DateTime.Now.ToString("HH:mm:ss"));
 
                 // Launch the updated application.
-                 new Process() { StartInfo = new ProcessStartInfo(Properties.Settings.Default.ApplicationPath, String.Empty) }.Start();
+                 new Process() { StartInfo = new ProcessStartInfo(Properties.Settings.Default.UpdateClientExecutablePath, String.Empty) }.Start();
             }
             catch (Exception ex)
             {

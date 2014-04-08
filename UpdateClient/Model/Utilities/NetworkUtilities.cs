@@ -27,6 +27,7 @@ namespace UpdateClient.Model.Utilities
                 }
                 catch (Exception ex)
                 {
+                    System.Windows.MessageBox.Show(ex.ToString());
                     throw ex;
                 }
             }

@@ -9,6 +9,7 @@ namespace UpdateClient.Model.Enums
     public enum GameType
     {
         ARMA2,
+        ARMA2OA,
         ARMA3
     }
 }

@@ -500,6 +500,33 @@ namespace UpdateClient.Model.Controllers
                 // Build a launch string
                 StringBuilder LaunchParameters = new StringBuilder();
 
+                if (CurrentServer.Type == GameType.ARMA2OA && CurrentServer.Beta)
+                {
+                    LaunchParameters.Append(@"-beta=Expansion\Beta;Expansion\Beta\Expansion ");
+                }
+
+                if (pEntry.ModList.Count != 0)
+                {
+                    LaunchParameters.Append("\"-mod=");
+
+                    if (CurrentServer.Type.Equals(GameType.ARMA2OA) && !CurrentServer.GetBaseDirectory().ToLowerInvariant().Equals(Path.GetDirectoryName(Properties.Settings.Default.A2_Path.ToLowerInvariant())))
+                    {
+                        LaunchParameters.Append(String.Format("{0};Expansion;CA;", Path.GetDirectoryName(Properties.Settings.Default.A2_Path)));
+                    }
+
+                    foreach (String Mod in pEntry.ModList)
+                    {
+                        if (Mod != pEntry.ModList.Last())
+                        {
+                            LaunchParameters.AppendFormat("{0};", Mod);
+                        }
+                        else
+                        {
+                            LaunchParameters.AppendFormat("{0}\" ", Mod);
+                        }
+                    }
+                }
+
                 if (pEntry.NoSplash)
                     LaunchParameters.Append("-nosplash ");
 
@@ -524,21 +551,6 @@ namespace UpdateClient.Model.Controllers
                 if (pEntry.MaxMemoryChecked)
                     LaunchParameters.AppendFormat("-maxMem={0} ", pEntry.MaxMemory);
 
-                if(pEntry.ModList.Count != 0)
-                {
-                    LaunchParameters.Append("-mod=");
-                    foreach(String Mod in pEntry.ModList)
-                    {
-                        if (Mod != pEntry.ModList.Last())
-                            LaunchParameters.AppendFormat("{0};", Mod);
-                        else
-                            LaunchParameters.AppendFormat("{0} ", Mod);
-                    }
-                }
-
-                if(CurrentServer.Beta)
-                    LaunchParameters.Append(@"-beta=Expansion\Beta;Expansion\Beta\Expansion ");
-                
                 if(pEntry.AutoConnect)
                     LaunchParameters.AppendFormat("-connect={0} -port={1} -password={2} ", CurrentServer.Hostname, CurrentServer.Port, CurrentServer.Password);
 

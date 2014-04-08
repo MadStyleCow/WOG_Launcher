@@ -8,13 +8,13 @@
     <Setting Name="LocalManifest" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Resources\AppManifest.xml</Value>
     </Setting>
-    <Setting Name="ApplicationPath" Type="System.String" Scope="Application">
+    <Setting Name="UpdateClientExecutablePath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">UpdateClient.exe</Value>
     </Setting>
     <Setting Name="RetryAttempts" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">3</Value>
     </Setting>
-    <Setting Name="UpdateClient" Type="System.String" Scope="Application">
+    <Setting Name="UpdateClientProcessName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">UpdateClient.exe</Value>
     </Setting>
   </Settings>

@@ -26,19 +26,19 @@ namespace UpdateClient.UI.Windows
         }
 
         /* UI Element Event Handlers */
-        private void eArmA2PathBrowse_Click(object sender, RoutedEventArgs e)
+        private void eArmA2OAPathBrowse_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.OpenFileDialog() { Filter = "Executable|*.exe|Script|*.bat|All files|*.*", Multiselect = false, CheckPathExists = true, CheckFileExists = true };
+            var dialog = new System.Windows.Forms.OpenFileDialog() { Filter = "Executable|*.exe|All files|*.*", Multiselect = false, CheckPathExists = true, CheckFileExists = true };
 
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                eArmA2Path.Text = dialog.FileName;
+                eArmA2OAPath.Text = dialog.FileName;
             }
         }
 
         private void eArmA3PathBrowse_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.OpenFileDialog() { Filter = "Executable|*.exe|Script|*.bat|All files|*.*", Multiselect = false, CheckPathExists = true, CheckFileExists = true };
+            var dialog = new System.Windows.Forms.OpenFileDialog() { Filter = "Executable|*.exe|All files|*.*", Multiselect = false, CheckPathExists = true, CheckFileExists = true };
 
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -46,10 +46,23 @@ namespace UpdateClient.UI.Windows
             }
         }
 
+        private void eArmA2PathBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new System.Windows.Forms.OpenFileDialog() { Filter = "Executable|*.exe|All files|*.*", Multiselect = false, CheckPathExists = true, CheckFileExists = true };
+
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                eArmA2Path.Text = dialog.FileName;
+            }
+        }
+
         private void eOKButton_Click(object sender, RoutedEventArgs e)
         {
             if (eArmA2Path.Text != String.Empty)
                 Properties.Settings.Default.A2_Path = eArmA2Path.Text;
+
+            if (eArmA2OAPath.Text != String.Empty)
+                Properties.Settings.Default.A2OA_Path = eArmA2OAPath.Text;
 
             if (eArmA3Path.Text != String.Empty)
                 Properties.Settings.Default.A3_Path = eArmA3Path.Text;
@@ -66,7 +79,10 @@ namespace UpdateClient.UI.Windows
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             eArmA2Path.Text = Properties.Settings.Default.A2_Path;
+            eArmA2OAPath.Text = Properties.Settings.Default.A2OA_Path;
             eArmA3Path.Text = Properties.Settings.Default.A3_Path;
         }
+
+
     }
 }

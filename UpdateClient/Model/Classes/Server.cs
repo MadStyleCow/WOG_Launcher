@@ -84,14 +84,38 @@ namespace UpdateClient.Model.Classes
             {
                 case GameType.ARMA2:
                     if (Properties.Settings.Default.A2_Path != String.Empty)
+                    {
                         return Path.GetDirectoryName(Properties.Settings.Default.A2_Path);
+                    }
                     else
+                    {
                         return String.Empty;
+                    }
+                case GameType.ARMA2OA:
+                    if (Properties.Settings.Default.A2OA_Path != String.Empty)
+                    {
+                        if (Path.GetDirectoryName(Properties.Settings.Default.A2OA_Path).EndsWith("\\Expansion\\beta", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            return Path.GetDirectoryName(Properties.Settings.Default.A2OA_Path).Replace("\\Expansion\\beta", "");
+                        }
+                        else
+                        {
+                            return Path.GetDirectoryName(Properties.Settings.Default.A2OA_Path);
+                        }
+                    }
+                    else
+                    {
+                        return String.Empty;
+                    }
                 case GameType.ARMA3:
                     if (Properties.Settings.Default.A3_Path != String.Empty)
+                    {
                         return Path.GetDirectoryName(Properties.Settings.Default.A3_Path);
+                    }
                     else
+                    {
                         return String.Empty;
+                    }
                 default:
                     throw new NotImplementedException();
             }
@@ -103,6 +127,8 @@ namespace UpdateClient.Model.Classes
             {
                 case GameType.ARMA2:
                     return Properties.Settings.Default.A2_Path;
+                case GameType.ARMA2OA:
+                    return Properties.Settings.Default.A2OA_Path;
                 case GameType.ARMA3:
                     return Properties.Settings.Default.A3_Path;
                 default:
@@ -141,7 +167,7 @@ namespace UpdateClient.Model.Classes
                         if ((Attributes & FileAttributes.Directory) == FileAttributes.Directory)
                         {
                             // If Directory
-                            if(!AddonList.Any(p => p.RelativePath.Contains(EntryPath)))
+                            if(!AddonList.Any(p => p.RelativePath.ToLowerInvariant().Contains(EntryPath.ToLowerInvariant())))
                             {
                                 FileSystemEntries.Add(EntryPath);
                             }
@@ -149,7 +175,7 @@ namespace UpdateClient.Model.Classes
                         else
                         {
                             // If file
-                            if (!AddonList.Any(p => p.RelativePath.StartsWith(Path.GetDirectoryName(EntryPath))) || !AddonList.Any(p => p.Name == Path.GetFileName(EntryPath)))
+                            if (!AddonList.Any(p => p.RelativePath.StartsWith(Path.GetDirectoryName(EntryPath), StringComparison.InvariantCultureIgnoreCase)) || !AddonList.Any(p => p.Name.ToLowerInvariant() == Path.GetFileName(EntryPath).ToLowerInvariant()))
                             {
                                 FileSystemEntries.Add(EntryPath);
                             }

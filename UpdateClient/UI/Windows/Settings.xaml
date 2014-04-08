@@ -1,7 +1,7 @@
 ﻿<Window x:Class="UpdateClient.UI.Windows.Settings"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Settings" Height="160" Width="400" Loaded="Window_Loaded" ResizeMode="NoResize" WindowStyle="ThreeDBorderWindow" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Icon="http://www.isilo.com/support/manual/iSiloIP/img/gearIcon.gif">
+        Title="Settings" Height="232" Width="553" Loaded="Window_Loaded" ResizeMode="NoResize" WindowStyle="ThreeDBorderWindow" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Icon="http://www.isilo.com/support/manual/iSiloIP/img/gearIcon.gif">
         <Grid x:Name="eElementPanel" Margin="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -14,18 +14,22 @@
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
-                </Grid.RowDefinitions>
+                    <RowDefinition/>
+            </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Label x:Name="eArmA2PathLabel" Content="ArmA II Executable" Margin="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-                <Label x:Name="eArmA3PathLabel" Content="ArmA III Executable" Margin="0" Grid.Row="1" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-                <TextBox x:Name="eArmA2Path" Grid.Column="1" Margin="0,12,5,12" Height="20"/>
-                <TextBox x:Name="eArmA3Path" Grid.Column="1" Height="20" Margin="0,12,5,12" Grid.Row="1" VerticalAlignment="Center"/>
-                <Button x:Name="eArmA2PathBrowse" Content="..." Grid.Column="2" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Center" Height="20" Width="12" Click="eArmA2PathBrowse_Click"/>
-                <Button x:Name="eArmA3PathBrowse" Content="..." Grid.Column="2" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Center" Height="20" Width="12" Grid.Row="1" Click="eArmA3PathBrowse_Click"/>
+                <Label x:Name="eArmA2PathLabel" Content="ArmA II Executable" Margin="0" Grid.Row="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+                <Label x:Name="eArmA2OAPathLabel" Content="ArmA II:OA Executable" Margin="0" Grid.Row="1" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+                <Label x:Name="eArmA3PathLabel" Content="ArmA III Executable" Margin="0" Grid.Row="2" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="eArmA2Path" Grid.Column="1" Margin="0,12,5,12" Grid.Row="0" Height="20"/>
+                <TextBox x:Name="eArmA2OAPath" Grid.Column="1" Margin="0,12,5,12" Grid.Row="1" Height="20"/>
+                <TextBox x:Name="eArmA3Path" Grid.Column="1" Height="20" Margin="0,12,5,12" Grid.Row="2" VerticalAlignment="Center"/>
+                <Button x:Name="eArmA2PathBrowse" Content="..." Grid.Column="2" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Center" Height="20" Width="12" Grid.Row="0" Click="eArmA2PathBrowse_Click"/>
+                <Button x:Name="eArmA2OAPathBrowse" Content="..." Grid.Column="2" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Center" Height="20" Width="12" Grid.Row="1" Click="eArmA2OAPathBrowse_Click"/>
+                <Button x:Name="eArmA3PathBrowse" Content="..." Grid.Column="2" HorizontalAlignment="Center" Margin="0,0,5,0" VerticalAlignment="Center" Height="20" Width="12" Grid.Row="2" Click="eArmA3PathBrowse_Click"/>
             </Grid>
             <Grid x:Name="eButtonGrid" Margin="0" Grid.Row="1">
                 <Grid.ColumnDefinitions>
