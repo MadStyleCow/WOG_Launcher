@@ -20,11 +20,25 @@ namespace UpdateClient.UI.Pages
     /// </summary>
     public partial class Browser : Page
     {
+        /* Fields */
+        System.Windows.Forms.Integration.WindowsFormsHost eHost;
+        System.Windows.Forms.WebBrowser eBrowser;
+
+        /* Constructors */
         public Browser()
         {
+            // Draw UI
             InitializeComponent();
+
+            // Initialize the WinForm host
+            this.eHost = new System.Windows.Forms.Integration.WindowsFormsHost();
+            this.eBrowser = new System.Windows.Forms.WebBrowser();
+            this.eBrowser.ScrollBarsEnabled = false;
+            this.eHost.Child = eBrowser;
+            this.eBrowserGrid.Children.Add(this.eHost);
         }
 
+        /* UI Access */
         public void SetBrowserTarget(String pUri)
         {
             eBrowser.Navigate(pUri);

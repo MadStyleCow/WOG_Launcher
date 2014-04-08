@@ -24,9 +24,6 @@ namespace UpdateClient.Model.Controllers
             this.Parent = pParent;
             this.TokenSource = new CancellationTokenSource();
 
-            // Configure the logger
-            log4net.Config.XmlConfigurator.Configure();
-
             // Set current state to INIT.
             this.ApplicationState = AppState.INIT;
             SetUIState(AppState.INIT);

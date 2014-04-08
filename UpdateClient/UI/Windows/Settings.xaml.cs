@@ -28,7 +28,7 @@ namespace UpdateClient.UI.Windows
         /* UI Element Event Handlers */
         private void eArmA2PathBrowse_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.OpenFileDialog() { Filter = "Executable|*.exe|All files|*.*", Multiselect = false, CheckPathExists = true, CheckFileExists = true };
+            var dialog = new System.Windows.Forms.OpenFileDialog() { Filter = "Executable|*.exe|Script|*.bat|All files|*.*", Multiselect = false, CheckPathExists = true, CheckFileExists = true };
 
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -38,7 +38,7 @@ namespace UpdateClient.UI.Windows
 
         private void eArmA3PathBrowse_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.OpenFileDialog() { Filter = "Executable|*.exe|All files|*.*", Multiselect = false, CheckPathExists = true, CheckFileExists = true };
+            var dialog = new System.Windows.Forms.OpenFileDialog() { Filter = "Executable|*.exe|Script|*.bat|All files|*.*", Multiselect = false, CheckPathExists = true, CheckFileExists = true };
 
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {

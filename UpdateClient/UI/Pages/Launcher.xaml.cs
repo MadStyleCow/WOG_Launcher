@@ -21,6 +21,9 @@ namespace UpdateClient.UI.Pages
     /// </summary>
     public partial class Launcher : Page
     {
+        /* Fields */
+        Guid CurrentServer { get; set; }
+
         /* Constructors */
         public Launcher()
         {
@@ -44,12 +47,16 @@ namespace UpdateClient.UI.Pages
 
         public void SetSettings(SettingsCacheEntry pEntry)
         {
+            CurrentServer = pEntry.ServerIdKey;
+
             foreach (String Mod in pEntry.ModList)
             {
                 foreach (CheckBox Item in eMods.Items)
                 {
-                    if (((TextBlock)Item.Content).Text == Mod)
+                    if (((TextBlock)Item.Content).Text.ToLowerInvariant().Equals(Mod.ToLowerInvariant()))
+                    {
                         Item.IsChecked = true;
+                    }
                 }
             }
 
@@ -88,6 +95,7 @@ namespace UpdateClient.UI.Pages
 
                 return new SettingsCacheEntry()
                 {
+                    ServerIdKey = CurrentServer,
                     AutoConnect = (eConnect.IsChecked == true),
                     Windowed = (eWindowMode.IsChecked == true),
                     ShowScriptErrors = (eShowScriptErrors.IsChecked == true),
