@@ -90,6 +90,16 @@ namespace UpdateClient.Core.Classes
             return true;
         }
 
+        public string GetBaseDirectory()
+        {
+            throw new NotSupportedException();
+        }
+
+        public string GetLaunchPath()
+        {
+            throw new NotSupportedException();
+        }
+
         public List<String> GetFileList()
         {
             // Set base directory
