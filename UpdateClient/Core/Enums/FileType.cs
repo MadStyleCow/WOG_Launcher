@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UpdateClient.Model.Classes
+namespace UpdateClient.Core.Enums
 {
-    public class Mod
+    public enum FileType
     {
-        /* Fields */
-        public String Name;
+        APPLICATION,
+        UPDATER
     }
 }

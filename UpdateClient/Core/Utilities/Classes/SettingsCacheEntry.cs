@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UpdateClient.Model.Utilities.Classes
+namespace UpdateClient.Core.Utilities.Classes
 {
     [Serializable()]
     public class SettingsCacheEntry

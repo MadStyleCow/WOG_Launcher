@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UpdateClient.Model.Classes;
+using UpdateClient.Core.Classes;
 
-namespace UpdateClient.Model.Utilities
+namespace UpdateClient.Core.Utilities
 {
     public static class Converters
     {

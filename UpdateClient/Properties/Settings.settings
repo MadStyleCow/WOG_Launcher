@@ -30,7 +30,13 @@
       <Value Profile="(Default)">ApplicationUpdate.exe</Value>
     </Setting>
     <Setting Name="A2_Path" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Program Files (x86)\Steam\SteamApps\common\Arma 2\arma2.exe</Value>
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="A2OABeta_Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Steam_Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

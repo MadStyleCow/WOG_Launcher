@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using UpdateClient.Model.Utilities.Classes;
+using UpdateClient.Core.Utilities.Classes;
 using System.Windows;
 
-namespace UpdateClient.Model.Utilities
+namespace UpdateClient.Core.Utilities
 {
     class FileCache
     {
@@ -15,8 +15,8 @@ namespace UpdateClient.Model.Utilities
         public static FileCache Instance = new FileCache();
 
         /* Private fields */
-        FileCacheEntryList CacheEntryList;
-        String FileCacheLocation;
+        FileCacheEntryList CacheEntryList { get; set; }
+        String FileCacheLocation { get; set; }
 
         /* Constructors */
         public FileCache()

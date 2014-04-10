@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UpdateClient.Model.Classes
+namespace UpdateClient.Core.Classes
 {
     [Serializable()]
     public class Manifest

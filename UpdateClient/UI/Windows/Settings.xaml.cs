@@ -82,7 +82,5 @@ namespace UpdateClient.UI.Windows
             eArmA2OAPath.Text = Properties.Settings.Default.A2OA_Path;
             eArmA3Path.Text = Properties.Settings.Default.A3_Path;
         }
-
-
     }
 }

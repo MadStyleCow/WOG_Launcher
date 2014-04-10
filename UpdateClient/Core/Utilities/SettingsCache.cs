@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UpdateClient.Model.Utilities.Classes;
+using UpdateClient.Core.Utilities.Classes;
 
-namespace UpdateClient.Model.Utilities
+namespace UpdateClient.Core.Utilities
 {
     class SettingsCache
     {

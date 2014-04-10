@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace UpdateClient.Model.Utilities
+namespace UpdateClient.Core.Utilities
 {
     public static class XMLSerializer
     {

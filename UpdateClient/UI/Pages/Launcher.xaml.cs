@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using UpdateClient.Model.Utilities.Classes;
+using UpdateClient.Core.Utilities.Classes;
 
 namespace UpdateClient.UI.Pages
 {
