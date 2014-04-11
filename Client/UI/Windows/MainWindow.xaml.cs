@@ -48,7 +48,8 @@ namespace Client.UI.Windows
         {
             try
             {
-                Task.Run(() => Controller.InitializeController());
+                SetUIState(AppState.CHECK);
+                //Task.Run(() => Controller.InitializeController());
             }
             catch (Exception ex)
             {

@@ -11,9 +11,7 @@ namespace Client.Core.Enums
         STEAM,
         ARMA2,
         ARMA2OA,
-        ARMA2OA_MODS,
         ARMA2OABETA,
         ARMA3,
-        ARMA3_MODS
     }
 }

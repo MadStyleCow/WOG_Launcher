@@ -18,7 +18,7 @@ namespace Client.Core.Utilities
         public OperatingSystem OS   { get; private set; }
         public Int32 CpuCount       { get; private set; }
 
-        // Paths should store the file to the executable
+        // Paths should store the way to the executable
         public String A2Path        { get; private set; }
         public String A2OAPath      { get; private set; }    
         public String A2OABetaPath  { get; private set; }
@@ -26,6 +26,7 @@ namespace Client.Core.Utilities
         public String SteamPath     { get; private set; }
 
         // Paths should store only the folder
+        public String A2AddonPath   { get; private set; }
         public String A2OAAddonPath { get; private set; }
         public String A3AddonPath   { get; private set; }
 
@@ -43,18 +44,19 @@ namespace Client.Core.Utilities
             this.CpuCount = Environment.ProcessorCount;
 
             // Assign paths
-            this.SteamPath = LocatePath(GameType.STEAM);
-            this.A2Path = LocatePath(GameType.ARMA2);
-            this.A2OAPath = LocatePath(GameType.ARMA2OA);
-            this.A2OABetaPath = LocatePath(GameType.ARMA2OABETA);
-            this.A3Path = LocatePath(GameType.ARMA3);
+            this.SteamPath = LocateExecutablePath(GameType.STEAM);
+            this.A2Path = LocateExecutablePath(GameType.ARMA2);
+            this.A2OAPath = LocateExecutablePath(GameType.ARMA2OA);
+            this.A2OABetaPath = LocateExecutablePath(GameType.ARMA2OABETA);
+            this.A3Path = LocateExecutablePath(GameType.ARMA3);
 
-            this.A2OAAddonPath = LocatePath(GameType.ARMA2OA_MODS);
-            this.A3AddonPath = LocatePath(GameType.ARMA3_MODS);
+            this.A2AddonPath = LocateModPath(GameType.ARMA2);
+            this.A2OAAddonPath = LocateModPath(GameType.ARMA2OA);
+            this.A3AddonPath = LocateModPath(GameType.ARMA3);
         }
 
         /* Private methods */
-        private string LocatePath(GameType pGameType)
+        private string LocateExecutablePath(GameType pGameType)
         {
             try
             {
@@ -148,8 +150,41 @@ namespace Client.Core.Utilities
                             }
                             return String.Empty;
                         }
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            catch(Exception)
+            {
+                throw;
+            }
+        }
 
-                    case GameType.ARMA2OA_MODS:
+        private String LocateModPath(GameType pGameType)
+        {
+            try
+            {
+                switch(pGameType)
+                {
+                    case GameType.ARMA2:
+                        if (!Properties.Settings.Default.A2_AddonPath.ToLowerInvariant().Equals(String.Empty))
+                        {
+                            return Properties.Settings.Default.A2_AddonPath;
+                        }
+                        else
+                        {
+                            if (!this.A2Path.Equals(String.Empty))
+                            {
+                                return Path.GetDirectoryName(this.A2Path);
+                            }
+                            else
+                            {
+                                return String.Empty;
+                            }
+                        }
+                        
+                    case GameType.ARMA2OA:
+                    case GameType.ARMA2OABETA:
                         if (!Properties.Settings.Default.A2OA_Addon_Path.ToLowerInvariant().Equals(String.Empty))
                         {
                             return Properties.Settings.Default.A2OA_Addon_Path;
@@ -158,7 +193,7 @@ namespace Client.Core.Utilities
                         {
                             if (!this.A2OAPath.Equals(String.Empty))
                             {
-                                return this.A2OAPath;
+                                return Path.GetDirectoryName(this.A2OAPath);
                             }
                             else
                             {
@@ -166,7 +201,7 @@ namespace Client.Core.Utilities
                             }
                         }
 
-                    case GameType.ARMA3_MODS:
+                    case GameType.ARMA3:
                         if (!Properties.Settings.Default.A3_Addon_Path.ToLowerInvariant().Equals(String.Empty))
                         {
                             return Properties.Settings.Default.A3_Addon_Path;
@@ -175,7 +210,7 @@ namespace Client.Core.Utilities
                         {
                             if (!this.A3Path.Equals(String.Empty))
                             {
-                                return this.A3Path;
+                                return Path.GetDirectoryName(this.A3Path);
                             }
                             else
                             {
@@ -213,8 +248,6 @@ namespace Client.Core.Utilities
                         return Path.GetDirectoryName(A2OAPath);
                     case GameType.ARMA2OABETA:
                         return Path.GetDirectoryName(A2OABetaPath);
-                    case GameType.ARMA2OA_MODS:
-                        return Path.GetDirectoryName(A2OAAddonPath);
                     case GameType.ARMA3:
                         return Path.GetDirectoryName(A3Path);
                     default:
@@ -222,6 +255,37 @@ namespace Client.Core.Utilities
                 }
             }
             catch(Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Returns a mod directory for the indicated game type.
+        /// </summary>
+        /// <param name="pGameType">Game type, for which the mod directory should be returned.</param>
+        /// <returns>Game mod directory path.</returns>
+        public string GetModDirectory(GameType pGameType)
+        {
+            try
+            {
+                switch(pGameType)
+                {
+                    case GameType.ARMA2:
+                        return A2AddonPath;
+
+                    case GameType.ARMA2OA:
+                    case GameType.ARMA2OABETA:
+                        return A2OAAddonPath;
+
+                    case GameType.ARMA3:
+                        return A3AddonPath;
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            catch (Exception)
             {
                 throw;
             }
@@ -258,6 +322,9 @@ namespace Client.Core.Utilities
             }
         }
 
+        /// <summary>
+        /// Saves the local machine paths into the user settings, in order to allow them to be reused on next launch.
+        /// </summary>
         public void Save()
         {
             try

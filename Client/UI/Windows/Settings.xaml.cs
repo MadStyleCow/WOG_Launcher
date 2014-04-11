@@ -26,7 +26,7 @@ namespace Client.UI.Windows
         }
 
         /* UI Element Event Handlers */
-        private void eArmA2OAPathBrowse_Click(object sender, RoutedEventArgs e)
+        /*private void eArmA2OAPathBrowse_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new System.Windows.Forms.OpenFileDialog() { Filter = "Executable|*.exe|All files|*.*", Multiselect = false, CheckPathExists = true, CheckFileExists = true };
 
@@ -81,6 +81,6 @@ namespace Client.UI.Windows
             eArmA2Path.Text = Properties.Settings.Default.A2_Path;
             eArmA2OAPath.Text = Properties.Settings.Default.A2OA_Path;
             eArmA3Path.Text = Properties.Settings.Default.A3_Path;
-        }
+        }*/
     }
 }

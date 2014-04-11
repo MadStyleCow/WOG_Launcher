@@ -18,6 +18,7 @@ namespace Client
         {
             // Configure the logger
             log4net.Config.XmlConfigurator.Configure();
+
         }
     }
 }

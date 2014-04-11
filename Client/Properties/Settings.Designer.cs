@@ -169,5 +169,17 @@ namespace Client.Properties {
                 return ((string)(this["ApplicationUpdateClient"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string A2_AddonPath {
+            get {
+                return ((string)(this["A2_AddonPath"]));
+            }
+            set {
+                this["A2_AddonPath"] = value;
+            }
+        }
     }
 }

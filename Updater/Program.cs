@@ -16,7 +16,7 @@ namespace Updater
         /*
          * Purpose of this application is to update the main UpdateClient, when any changes to files are required.   
          */
-        private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(typeof(Program)); //log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [STAThread]
         static void Main(string[] args)
