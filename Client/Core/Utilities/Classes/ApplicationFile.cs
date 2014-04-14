@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Client.Core.Enums;
 
-namespace Client.Core.Classes
+namespace Client.Core.Utilities.Classes
 {
     [Serializable()]
     public class ApplicationFile

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Client.Core.Classes
+namespace Client.Core.Utilities.Classes
 {
     [Serializable()]
     public class ApplicationManifest

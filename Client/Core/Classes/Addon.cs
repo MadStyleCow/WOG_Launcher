@@ -40,7 +40,7 @@ namespace Client.Core.Classes
                         }
                         else
                         {
-                            String NewHash = FileUtilities.CalculateHash(RelativeAddonPath).Result;
+                            String NewHash = await FileUtilities.CalculateHash(RelativeAddonPath);
                             FileCache.Instance.Update(RelativeAddonPath, NewHash, AddonFileInfo.LastWriteTimeUtc);
                             if (!pExtensions.Contains(AddonFileInfo.Extension.ToUpperInvariant()))
                                 Status = (NewHash == Hash);
@@ -50,7 +50,7 @@ namespace Client.Core.Classes
                     }
                     else
                     {
-                        String NewHash = FileUtilities.CalculateHash(RelativeAddonPath).Result;
+                        String NewHash = await FileUtilities.CalculateHash(RelativeAddonPath);
                         FileCache.Instance.Add(RelativeAddonPath, NewHash, AddonFileInfo.LastWriteTimeUtc);
                         if (!pExtensions.Contains(AddonFileInfo.Extension.ToUpperInvariant()))
                             Status = (NewHash == Hash);
@@ -70,14 +70,14 @@ namespace Client.Core.Classes
 
         public async Task UpdateAddon(String pBaseDirectory)
         {
-            Directory.SetCurrentDirectory(pBaseDirectory);
-
             String TemporaryFile = Path.GetTempFileName();
+
+            Directory.SetCurrentDirectory(pBaseDirectory);
 
             try
             {
-                await NetworkUtilities.DownloadToFile(AbsoluteURL, TemporaryFile);
-                await FileUtilities.ExtractArchive(TemporaryFile, Name, String.Format("{0}\\{1}", RelativePath, Name));
+                await NetworkUtilities.DownloadToFile(AbsoluteURL, TemporaryFile).ContinueWith(t => 
+                        FileUtilities.ExtractArchive(TemporaryFile, Name, String.Format("{0}\\{1}", RelativePath, Name)));
             }
             catch(Exception)
             {
@@ -86,7 +86,9 @@ namespace Client.Core.Classes
             finally
             {
                 if (File.Exists(TemporaryFile))
+                {
                     File.Delete(TemporaryFile);
+                }
             }
         }
     }

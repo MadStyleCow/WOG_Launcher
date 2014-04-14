@@ -69,13 +69,19 @@ namespace Client.Core.Classes
             finally
             {
                 if (File.Exists(ServerManifestTemp))
+                {
                     File.Delete(ServerManifestTemp);
+                }
 
                 if (File.Exists(ServerAddonListTemp))
+                {
                     File.Delete(ServerAddonListTemp);
+                }
 
                 if (File.Exists(ServerModListTemp))
+                { 
                     File.Delete(ServerModListTemp);
+                }
             }
         }
 

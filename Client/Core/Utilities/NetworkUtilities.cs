@@ -13,24 +13,29 @@ namespace Client.Core.Utilities
         /// <param name="pInputUrl">URL of the file to be downloaded.</param>
         /// <param name="pOutputPath">Output for the result</param>
         /// <returns></returns>
-        public static async Task DownloadToFile(String pInputUrl, String pOutputPath)
+        public static async Task<Boolean> DownloadToFile(String pInputUrl, String pOutputPath)
         {
             for (int CycleCount = 0; CycleCount < Properties.Settings.Default.RetryAttempts; CycleCount++)
             {
                 try
                 {
                     await new WebClient().DownloadFileTaskAsync(pInputUrl, pOutputPath);
+                    return true;
                 }
-                catch(OperationCanceledException ex)
+                catch(OperationCanceledException)
                 {
-                    throw ex;
+                    throw;
                 }
-                catch (Exception ex)
+                catch(WebException)
                 {
-                    System.Windows.MessageBox.Show(ex.ToString());
-                    throw ex;
+                    // File not accessable or timed out while trying to download. In any case - do nothing.
+                }
+                catch (Exception)
+                {
+                    throw;
                 }
             }
+            return false;
         }
 
         /// <summary>
@@ -44,13 +49,13 @@ namespace Client.Core.Utilities
             {
                 return await new WebClient().DownloadStringTaskAsync(pInputUrl);
             }
-            catch(OperationCanceledException ex)
+            catch(OperationCanceledException)
             {
-                throw ex;
+                throw;
             }
-            catch(Exception ex)
+            catch(Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -89,13 +94,13 @@ namespace Client.Core.Utilities
                     throw new ApplicationException("No mirrors available.");
                 }
             }
-            catch(OperationCanceledException ex)
+            catch(OperationCanceledException)
             {
-                throw ex;
+                throw;
             }
-            catch(Exception ex)
+            catch(Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -134,13 +139,13 @@ namespace Client.Core.Utilities
                     throw new ApplicationException("No mirrors available.");
                 }
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
-                throw ex;
+                throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
     }
