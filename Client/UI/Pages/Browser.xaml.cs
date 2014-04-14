@@ -34,6 +34,8 @@ namespace Client.UI.Pages
             this.eHost = new System.Windows.Forms.Integration.WindowsFormsHost();
             this.eBrowser = new System.Windows.Forms.WebBrowser();
             this.eBrowser.ScrollBarsEnabled = false;
+            this.eBrowser.Width = Convert.ToInt32(this.eBrowserPage.RenderSize.Width);
+            this.eBrowser.Height = Convert.ToInt32(this.eBrowserPage.RenderSize.Height);
             this.eHost.Child = eBrowser;
             this.eBrowserGrid.Children.Add(this.eHost);
         }

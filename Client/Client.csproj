@@ -85,6 +85,7 @@
     <Compile Include="Core\Enums\FileType.cs" />
     <Compile Include="Core\Utilities\Classes\SettingsCacheEntry.cs" />
     <Compile Include="Core\Utilities\FileUtilities.cs" />
+    <Compile Include="Core\Utilities\GameLauncher.cs" />
     <Compile Include="Core\Utilities\LocalMachine.cs" />
     <Compile Include="Core\Utilities\NetworkUtilities.cs" />
     <Compile Include="Core\Utilities\SettingsCache.cs" />

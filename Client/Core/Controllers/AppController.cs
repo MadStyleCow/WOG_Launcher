@@ -144,7 +144,7 @@ namespace Client.Core.Controllers
         {
             try
             {
-                if (CurrentServer.GetBaseDirectory() == String.Empty || !Directory.Exists(CurrentServer.GetBaseDirectory()))
+                if (LocalMachine.Instance.GetBaseDirectory(CurrentServer.Type) == String.Empty || !Directory.Exists(LocalMachine.Instance.GetBaseDirectory(CurrentServer.Type)))
                 {
                     System.Windows.MessageBox.Show("Please set the base directory for this game.");
                     return;
@@ -227,6 +227,8 @@ namespace Client.Core.Controllers
                 LocalMachine.Instance.Save();
                 FileCache.Instance.Write();
                 SettingsCache.Instance.Write();
+
+                Environment.Exit(0);
             }
             catch (Exception)
             {
@@ -253,7 +255,7 @@ namespace Client.Core.Controllers
                 // Get the mod list for this server
                 List<String> ModFolderList = new List<string>();
 
-                foreach (String DirectoryPath in Directory.EnumerateDirectories(CurrentServer.GetBaseDirectory(), "@*", SearchOption.TopDirectoryOnly))
+                foreach (String DirectoryPath in Directory.EnumerateDirectories(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), "@*", SearchOption.TopDirectoryOnly))
                 {
                     ModFolderList.Add(Path.GetFileName(DirectoryPath));
                 }
@@ -279,7 +281,7 @@ namespace Client.Core.Controllers
                         ServerIdKey = CurrentServer.IdKey,
                         ModList = ModList,
                         AdditionalParameters = "-nolog",
-                        AutoConnect = false,
+                        AutoConnect = true,
                         EmptyWorld = false,
                         NoSplash = true,
                         WinXP = false,
@@ -405,7 +407,7 @@ namespace Client.Core.Controllers
                 Parallel.ForEach(CurrentServer.AddonList, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount, CancellationToken = TokenSource.Token }, file =>
                 {
                     // Check the status of the addon
-                    file.CheckAddon(CurrentServer.GetBaseDirectory(), CurrentServer.ConfigExtensionList).Wait();
+                    file.CheckAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.ConfigExtensionList).Wait();
 
                     // Update the counter
                     Counter++;
@@ -455,10 +457,10 @@ namespace Client.Core.Controllers
                 Parallel.ForEach(AddonsToDownload, new ParallelOptions() { MaxDegreeOfParallelism = CurrentServer.ThreadCount, CancellationToken = TokenSource.Token }, file =>
                 {
                     // Download the file.
-                    file.UpdateAddon(CurrentServer.GetBaseDirectory()).Wait();
+                    file.UpdateAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type)).Wait();
 
                     // And then check it
-                    file.CheckAddon(CurrentServer.GetBaseDirectory(), CurrentServer.ConfigExtensionList).Wait();
+                    file.CheckAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.ConfigExtensionList).Wait();
                     
                     Counter++;
 
@@ -497,68 +499,8 @@ namespace Client.Core.Controllers
                 this.ApplicationState = AppState.CLOSE;
                 SetUIState(AppState.CLOSE);
 
-                // Build a launch string
-                StringBuilder LaunchParameters = new StringBuilder();
-
-                if (CurrentServer.Type == GameType.ARMA2OA && CurrentServer.Beta)
-                {
-                    LaunchParameters.Append(@"-beta=Expansion\Beta;Expansion\Beta\Expansion ");
-                }
-
-                if (pEntry.ModList.Count != 0)
-                {
-                    LaunchParameters.Append("\"-mod=");
-
-                    if (CurrentServer.Type.Equals(GameType.ARMA2OA) && !CurrentServer.GetBaseDirectory().ToLowerInvariant().Equals(Path.GetDirectoryName(Properties.Settings.Default.A2_Path.ToLowerInvariant())))
-                    {
-                        LaunchParameters.Append(String.Format("{0};Expansion;CA;", Path.GetDirectoryName(Properties.Settings.Default.A2_Path)));
-                    }
-
-                    foreach (String Mod in pEntry.ModList)
-                    {
-                        if (Mod != pEntry.ModList.Last())
-                        {
-                            LaunchParameters.AppendFormat("{0};", Mod);
-                        }
-                        else
-                        {
-                            LaunchParameters.AppendFormat("{0}\" ", Mod);
-                        }
-                    }
-                }
-
-                if (pEntry.NoSplash)
-                    LaunchParameters.Append("-nosplash ");
-
-                if (pEntry.ShowScriptErrors)
-                    LaunchParameters.Append("-showScriptErrors ");
-
-                if (pEntry.EmptyWorld)
-                    LaunchParameters.Append("-world=empty ");
-
-                if (pEntry.Windowed)
-                    LaunchParameters.Append("-window ");
-
-                if (pEntry.WinXP)
-                    LaunchParameters.Append("-winxp ");
-
-                if (pEntry.CpuCountChecked)
-                    LaunchParameters.AppendFormat("-cpuCount={0} ", pEntry.CpuCount);
-
-                if (pEntry.ExThreadsChecked)
-                    LaunchParameters.AppendFormat("-exThreads={0} ", pEntry.ExThreads);
-
-                if (pEntry.MaxMemoryChecked)
-                    LaunchParameters.AppendFormat("-maxMem={0} ", pEntry.MaxMemory);
-
-                if(pEntry.AutoConnect)
-                    LaunchParameters.AppendFormat("-connect={0} -port={1} -password={2} ", CurrentServer.Hostname, CurrentServer.Port, CurrentServer.Password);
-
-                if (pEntry.AdditionalParameters != String.Empty)
-                    LaunchParameters.Append(pEntry.AdditionalParameters);
-
                 // Save the setting set
-                if(SettingsCache.Instance.Contains(CurrentServer.IdKey))
+                if (SettingsCache.Instance.Contains(CurrentServer.IdKey))
                 {
                     SettingsCache.Instance.Update(CurrentServer.IdKey, pEntry);
                 }
@@ -568,25 +510,13 @@ namespace Client.Core.Controllers
                     SettingsCache.Instance.Add(pEntry);
                 }
 
-                // Launch the game
-                Process Game = new Process();
-                Game.StartInfo = new ProcessStartInfo()
-                {
-                    WorkingDirectory = CurrentServer.GetBaseDirectory(),
-                    FileName = CurrentServer.GetLaunchPath(),
-                    Arguments = LaunchParameters.ToString()
-                };
-                Game.Start();
+                GameLauncher.LaunchGame(this.CurrentServer, pEntry);
 
-                // Save all the required app settings
                 Shutdown();
-
-                // Exit the application.
-                System.Environment.Exit(0);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                System.Windows.MessageBox.Show(ex.ToString());
             }
         }
     }

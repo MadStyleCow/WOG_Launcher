@@ -19,16 +19,16 @@ namespace Client.Core.Utilities
         public Int32 CpuCount       { get; private set; }
 
         // Paths should store the way to the executable
-        public String A2Path        { get; private set; }
-        public String A2OAPath      { get; private set; }    
-        public String A2OABetaPath  { get; private set; }
-        public String A3Path        { get; private set; }        
-        public String SteamPath     { get; private set; }
+        public String A2Path        { get; set; }
+        public String A2OAPath      { get; set; }    
+        public String A2OABetaPath  { get; set; }
+        public String A3Path        { get; set; }        
+        public String SteamPath     { get; set; }
 
         // Paths should store only the folder
-        public String A2AddonPath   { get; private set; }
-        public String A2OAAddonPath { get; private set; }
-        public String A3AddonPath   { get; private set; }
+        public String A2AddonPath   { get; set; }
+        public String A2OAAddonPath { get; set; }
+        public String A3AddonPath   { get; set; }
 
         /* Private fields */
         List<String> SteamRegistryKeys  = new List<string>()    { @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Valve\Steam",                           @"HKEY_LOCAL_MACHINE\SOFTWARE\Valve\Steam"};
@@ -39,20 +39,26 @@ namespace Client.Core.Utilities
         /* Constructors */
         public LocalMachine()
         {
-            // Assign local machine parameters
-            this.OS = Environment.OSVersion;
-            this.CpuCount = Environment.ProcessorCount;
+            try
+            {
+                // Assign local machine parameters
+                this.OS = Environment.OSVersion;
+                this.CpuCount = Environment.ProcessorCount;
 
-            // Assign paths
-            this.SteamPath = LocateExecutablePath(GameType.STEAM);
-            this.A2Path = LocateExecutablePath(GameType.ARMA2);
-            this.A2OAPath = LocateExecutablePath(GameType.ARMA2OA);
-            this.A2OABetaPath = LocateExecutablePath(GameType.ARMA2OABETA);
-            this.A3Path = LocateExecutablePath(GameType.ARMA3);
-
-            this.A2AddonPath = LocateModPath(GameType.ARMA2);
-            this.A2OAAddonPath = LocateModPath(GameType.ARMA2OA);
-            this.A3AddonPath = LocateModPath(GameType.ARMA3);
+                // Assign paths
+                this.SteamPath = LocateExecutablePath(GameType.STEAM);
+                this.A2Path = LocateExecutablePath(GameType.ARMA2);
+                this.A2AddonPath = LocateModPath(GameType.ARMA2);
+                this.A2OAPath = LocateExecutablePath(GameType.ARMA2OA);
+                this.A2OAAddonPath = LocateModPath(GameType.ARMA2OA);
+                this.A2OABetaPath = LocateExecutablePath(GameType.ARMA2OABETA);
+                this.A3Path = LocateExecutablePath(GameType.ARMA3);
+                this.A3AddonPath = LocateModPath(GameType.ARMA3);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         /* Private methods */
@@ -123,9 +129,9 @@ namespace Client.Core.Utilities
                         }
                         else
                         {
-                            if (!this.A2OAPath.Equals(String.Empty))
+                            if (!this.A2OAAddonPath.Equals(String.Empty))
                             {
-                                return Path.Combine(Path.GetDirectoryName(this.A2OAPath), @"Expansion\Beta\Arma2oa.exe");
+                                return Path.Combine(this.A2OAAddonPath, @"Expansion\Beta\Arma2oa.exe");
                             }
                             else
                             {
@@ -312,6 +318,51 @@ namespace Client.Core.Utilities
                         return A2OABetaPath;
                     case GameType.ARMA3:
                         return A3Path;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the indicated gametype is a steam version.
+        /// </summary>
+        /// <param name="pGameType">Game type, for which the steam version status should be returned.</param>
+        /// <returns>Steam status</returns>
+        public bool SteamVersion(GameType pGameType)
+        {
+            try
+            {
+                switch (pGameType)
+                {
+                    case GameType.ARMA2:
+                        if (!GetBaseDirectory(GameType.ARMA2).Equals(String.Empty))
+                        {
+                            return Directory.GetFiles(GetBaseDirectory(GameType.ARMA2)).Length != 0;
+                        }
+                        else
+                        {
+                            throw new ArgumentNullException();
+                        }
+
+                    case GameType.ARMA2OA:
+                    case GameType.ARMA2OABETA:
+                        if (!GetBaseDirectory(GameType.ARMA2OA).Equals(String.Empty))
+                        {
+                            return Directory.GetFiles(GetBaseDirectory(GameType.ARMA2OA)).Length != 0;
+                        }
+                        else
+                        {
+                            throw new ArgumentNullException();
+                        }
+
+                    case GameType.ARMA3:
+                        return true;
+
                     default:
                         throw new NotImplementedException();
                 }

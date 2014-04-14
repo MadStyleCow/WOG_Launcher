@@ -98,16 +98,30 @@ namespace Client.Core.Utilities
         
         public void Add(SettingsCacheEntry pEntry)
         {
-            CacheEntryList.SettingsCacheEntries.Add(pEntry);
+            try
+            {
+                CacheEntryList.SettingsCacheEntries.Add(pEntry);
+            }
+            catch (Exception)
+            {            
+                throw;
+            }
         }
 
         public void Write()
         {
-            // Set the directory
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
+            try
+            {
+                // Set the directory
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
 
-            // Write the file
-            File.WriteAllText(SettingsCacheLocation, CacheEntryList.XmlSerializeToString());
+                // Write the file
+                File.WriteAllText(SettingsCacheLocation, CacheEntryList.XmlSerializeToString());
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

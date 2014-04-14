@@ -44,12 +44,11 @@ namespace Client.UI.Windows
         Launcher LauncherPage;
 
         /* UI Event Handlers */
-        private void eDocumentGrid_Loaded(object sender, RoutedEventArgs e)
+        private void eMainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                SetUIState(AppState.CHECK);
-                //Task.Run(() => Controller.InitializeController());
+                Task.Run(() => Controller.InitializeController());
             }
             catch (Exception ex)
             {
@@ -76,7 +75,7 @@ namespace Client.UI.Windows
         {
             try
             {
-                Settings SettingsWindow = new Settings();
+                Settings SettingsWindow = new Settings() { Owner = this };
                 SettingsWindow.ShowDialog();
             }
             catch (Exception ex)
@@ -101,7 +100,7 @@ namespace Client.UI.Windows
         {
             try
             {
-            Controller.Shutdown();
+                Controller.Shutdown();
             }
             catch (Exception ex)
             {

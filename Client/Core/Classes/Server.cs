@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Client.Core.Enums;
+using Client.Core.Utilities;
 
 namespace Client.Core.Classes
 {
@@ -90,20 +91,10 @@ namespace Client.Core.Classes
             return true;
         }
 
-        public string GetBaseDirectory()
-        {
-            throw new NotSupportedException();
-        }
-
-        public string GetLaunchPath()
-        {
-            throw new NotSupportedException();
-        }
-
         public List<String> GetFileList()
         {
             // Set base directory
-            Directory.SetCurrentDirectory(GetBaseDirectory());
+            Directory.SetCurrentDirectory(LocalMachine.Instance.GetBaseDirectory(this.Type));
 
             // Prepare
             List<String> FileSystemEntries = new List<string>();

@@ -6,6 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
+using Client.Core.Utilities;
+using Client.Core.Classes;
+using Client.Core.Utilities.Classes;
 
 namespace Client
 {
@@ -18,7 +21,6 @@ namespace Client
         {
             // Configure the logger
             log4net.Config.XmlConfigurator.Configure();
-
         }
     }
 }
