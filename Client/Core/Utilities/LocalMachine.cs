@@ -373,6 +373,64 @@ namespace Client.Core.Utilities
             }
         }
 
+        public bool PathsSet(GameType pGameType)
+        {
+            try
+            {
+                switch (pGameType)
+                {
+                    case GameType.ARMA2:
+                        if (SteamVersion(GameType.ARMA2))
+                        {
+                            return (!A2Path.Equals(String.Empty) && !SteamPath.Equals(String.Empty) && !A2AddonPath.Equals(String.Empty));
+                        }
+                        else
+                        {
+                            return (!A2Path.Equals(String.Empty));
+                        }
+
+                    case GameType.ARMA2OA:
+                        if(SteamVersion(GameType.ARMA2OA))
+                        {
+                            return (!A2Path.Equals(String.Empty) && !SteamPath.Equals(String.Empty) && !A2OAPath.Equals(String.Empty) && !A2OAAddonPath.Equals(String.Empty));
+                        }
+                        else
+                        {
+                            return (!A2OAPath.Equals(String.Empty) && !A2OAAddonPath.Equals(String.Empty));
+                        }
+                        
+                    case GameType.ARMA2OABETA:
+                        if (SteamVersion(GameType.ARMA2OA))
+                        {
+                            return (!A2Path.Equals(String.Empty) && !SteamPath.Equals(String.Empty) && !A2OAPath.Equals(String.Empty) && !A2OAAddonPath.Equals(String.Empty) && !A2OABetaPath.Equals(String.Empty));
+                        }
+                        else
+                        {
+                            return (!A2OAPath.Equals(String.Empty) && !A2OAAddonPath.Equals(String.Empty));
+                        }
+
+                    case GameType.ARMA3:
+                        if (SteamVersion(GameType.ARMA3))
+                        {
+                            return (!A3Path.Equals(String.Empty) && !SteamPath.Equals(String.Empty) && !A3AddonPath.Equals(String.Empty));
+                        }
+                        else
+                        {
+                            // Never gonna happen.
+                            return (!A3Path.Equals(String.Empty) && !A3AddonPath.Equals(String.Empty));
+                        }
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            catch(Exception)
+            {
+                throw;
+            }
+        }
+
         /// <summary>
         /// Saves the local machine paths into the user settings, in order to allow them to be reused on next launch.
         /// </summary>

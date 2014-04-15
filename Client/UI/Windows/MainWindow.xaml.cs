@@ -225,7 +225,8 @@ namespace Client.UI.Windows
                 switch (UIState)
                 {
                     case AppState.INIT:
-                        eSettingsButton.IsEnabled = false;
+                        eSettingsButton.IsEnabled = true;
+                        eSettingsButton.Visibility = System.Windows.Visibility.Hidden;
                         eServerSelect.IsEnabled = false;
                         eActionButton.IsEnabled = false;
                         eActionButton.Content = "Ponies!";
@@ -235,6 +236,7 @@ namespace Client.UI.Windows
 
                     case AppState.CHECK:
                         eSettingsButton.IsEnabled = true;
+                        eSettingsButton.Visibility = System.Windows.Visibility.Visible;
                         eServerSelect.IsEnabled = true;
                         eActionButton.IsEnabled = true;
                         eActionButton.Content = "Check";
@@ -245,6 +247,7 @@ namespace Client.UI.Windows
 
                     case AppState.UPDATE:
                         eSettingsButton.IsEnabled = true;
+                        eSettingsButton.Visibility = System.Windows.Visibility.Visible;
                         eServerSelect.IsEnabled = true;
                         eActionButton.IsEnabled = true;
                         eActionButton.Content = "Update";
@@ -254,6 +257,7 @@ namespace Client.UI.Windows
 
                     case AppState.PLAY:
                         eSettingsButton.IsEnabled = true;
+                        eSettingsButton.Visibility = System.Windows.Visibility.Visible;
                         eServerSelect.IsEnabled = true;
                         eActionButton.IsEnabled = true;
                         eActionButton.Content = "Play";
@@ -265,15 +269,26 @@ namespace Client.UI.Windows
                         break;
 
                     case AppState.CANCELCHECK:
-                    case AppState.CANCELUPDATE:
                         eSettingsButton.IsEnabled = false;
+                        eSettingsButton.Visibility = System.Windows.Visibility.Hidden;
                         eServerSelect.IsEnabled = false;
                         eActionButton.IsEnabled = true;
+                        eProgressLabel.Content = "Preparing to check addons...";
+                        eActionButton.Content = "Cancel";
+                        break;
+
+                    case AppState.CANCELUPDATE:
+                        eSettingsButton.IsEnabled = false;
+                        eSettingsButton.Visibility = System.Windows.Visibility.Hidden;
+                        eServerSelect.IsEnabled = false;
+                        eActionButton.IsEnabled = true;
+                        eProgressLabel.Content = "Preparing to update addons...";
                         eActionButton.Content = "Cancel";
                         break;
 
                     case AppState.CLOSE:
                         eSettingsButton.IsEnabled = false;
+                        eSettingsButton.Visibility = System.Windows.Visibility.Hidden;
                         eServerSelect.IsEnabled = false;
                         eActionButton.IsEnabled = false;
                         break;

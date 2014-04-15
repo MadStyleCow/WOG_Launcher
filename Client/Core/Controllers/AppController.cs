@@ -222,7 +222,6 @@ namespace Client.Core.Controllers
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
 
                 // Save the file cache as well as the settings cache.
-                LocalMachine.Instance.Save();
                 FileCache.Instance.Write();
                 SettingsCache.Instance.Write();
 
@@ -352,16 +351,10 @@ namespace Client.Core.Controllers
         {
             try
             {
-                // Check the base and mod directory paths for the selected server.
-                if (LocalMachine.Instance.GetBaseDirectory(this.CurrentServer.Type).Equals(String.Empty) || !Directory.Exists(LocalMachine.Instance.GetBaseDirectory(this.CurrentServer.Type)))
+                // Check the paths.
+                if (!LocalMachine.Instance.PathsSet(CurrentServer.Type))
                 {
-                    System.Windows.MessageBox.Show("Please set the base directory for this game.");
-                    return;
-                }
-
-                if (LocalMachine.Instance.GetModDirectory(this.CurrentServer.Type).Equals(String.Empty) || !Directory.Exists(LocalMachine.Instance.GetModDirectory(this.CurrentServer.Type)))
-                {
-                    System.Windows.MessageBox.Show("Please set the mod directory for this game.");
+                    System.Windows.MessageBox.Show("Please set the game and mod paths for this game.\nIf the game is a steam version - please set the steam path as well.");
                     return;
                 }
 
@@ -402,7 +395,7 @@ namespace Client.Core.Controllers
                         this.ApplicationState = AppState.UPDATE;
                         SetAppState(AppState.UPDATE);
 
-                        this.SetProgress(100f, String.Format("{0} files will be updated, {1} files will be deleted...", CurrentServer.AddonList.Count(p => !p.Status), CurrentServer.FileList.Count));
+                        this.SetProgress(100f, String.Format("{0} files will be updated ({1} MB), {2} files will be deleted...", CurrentServer.AddonList.Count(p => !p.Status), (CurrentServer.AddonList.FindAll(p => !p.Status).Sum(p => p.Size) / 1024 / 1024), CurrentServer.FileList.Count));
                     }
                     else
                     {
@@ -422,7 +415,6 @@ namespace Client.Core.Controllers
             try
             {
                 // Set UI state to CANCELUPDATE
-                this.ApplicationState = AppState.CANCELUPDATE;
                 SetAppState(AppState.CANCELUPDATE);
 
                 Int32 Counter = 0;
@@ -440,22 +432,25 @@ namespace Client.Core.Controllers
                     // Inform the UI
                     if (!TokenSource.IsCancellationRequested)
                     {
-                        this.SetProgress(Counter * (100f / AddonsToDownload.Count), String.Format("Updated {0} of {1} addons.", Counter, AddonsToDownload.Count));
+                        this.SetProgress(Counter * (100f / AddonsToDownload.Count), String.Format("Updated {0} ({1} MB) of {2} ({3} MB) addons.", Counter, AddonsToDownload.FindAll(p => p.Status).Sum(p => p.Size) / 1024 / 1024, AddonsToDownload.Count, AddonsToDownload.Sum(p => p.Size) / 1024 / 1024));
                     }
                 });
 
                 this.SetProgress(100f, "Deleting files...");
 
                 // File deletion
+                // Order a lot of file deletions and wait for them to complete.
+                List<Task> DeleteTasks = new List<Task>();
                 foreach (String Entry in CurrentServer.FileList)
                 {
                     if (Directory.Exists(Entry) || File.Exists(Entry))
                     {
-                        await FileUtilities.DeleteFile(Entry);
+                        DeleteTasks.Add(FileUtilities.DeleteFile(Entry));
                     }
                 }
+                await Task.WhenAll(DeleteTasks);
 
-                // Re-check all of the addons.
+                // Re-check all of the addons (just to be sure).
                 await CheckAddons();
             }
             catch (Exception)

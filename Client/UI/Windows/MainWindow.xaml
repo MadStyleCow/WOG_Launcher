@@ -5,25 +5,22 @@
     <Grid x:Name="eDocumentGrid" Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="1*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
         </Grid.ColumnDefinitions>
         <Grid x:Name="eHeaderGrid" Margin="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="11*"/>
-                <ColumnDefinition Width="141*"/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <ComboBox x:Name="eServerSelect" Grid.Column="1" HorizontalAlignment="Right" Margin="0,5,10,5" Width="250" VerticalAlignment="Center" IsReadOnly="True" Height="22" SelectionChanged="eServerSelect_SelectionChanged"/>
-            <Button x:Name="eSettingsButton" Content="" Grid.Column="0" HorizontalAlignment="Left" Margin="10,5,0,5" VerticalAlignment="Center" Padding="1" Width="20" BorderThickness="0" Click="eSettingsButton_Click">
+            <Button x:Name="eSettingsButton" Grid.Column="0" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Padding="1" Width="24" BorderThickness="0" Click="eSettingsButton_Click" Height="24">
                 <Button.Background>
-                    <ImageBrush Stretch="None">
-                        <ImageBrush.ImageSource>
-                            <BitmapImage UriSource="http://www.isilo.com/support/manual/iSiloIP/img/gearIcon.gif"/>
-                        </ImageBrush.ImageSource>
-                    </ImageBrush>
+                    <ImageBrush ImageSource="/Client;component/Resources/GearIcon.png" Stretch="UniformToFill" TileMode="Tile"/>
                 </Button.Background>
+
             </Button>
         </Grid>
         <Grid x:Name="eFooterGrid" Margin="0" Grid.Row="2">

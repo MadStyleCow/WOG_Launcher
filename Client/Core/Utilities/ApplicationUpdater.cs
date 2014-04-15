@@ -31,7 +31,7 @@ namespace Client.Core.Utilities
                 // Load the local manifest
                 ApplicationManifest LocalManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromFile(pLocalManifest, typeof(ApplicationManifest));
 
-                return (await AppManifestTask).ManifestVersion.Equals(LocalManifest.ManifestVersion);
+                return !(await AppManifestTask).ManifestVersion.Equals(LocalManifest.ManifestVersion);
             }
             catch(Exception)
             {             

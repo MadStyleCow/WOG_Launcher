@@ -183,7 +183,16 @@ namespace Client.Core.Utilities
                         if (pSettings.ModList.Count != 0)
                         {
                             ParameterString.AppendFormat("\"-beta={0};{1};\" ", LocalMachine.Instance.GetBaseDirectory(GameType.ARMA2OABETA), Path.Combine(LocalMachine.Instance.GetBaseDirectory(GameType.ARMA2OABETA), "expansion"));
-                            ParameterString.AppendFormat("\"-mod={0};{1};", LocalMachine.Instance.GetBaseDirectory(GameType.ARMA2), Path.Combine(LocalMachine.Instance.GetBaseDirectory(GameType.ARMA2OA), "expansion"));
+
+                            if (LocalMachine.Instance.SteamVersion(GameType.ARMA2OA))
+                            {
+                                ParameterString.AppendFormat("\"-mod={0};{1};", LocalMachine.Instance.GetBaseDirectory(GameType.ARMA2), Path.Combine(LocalMachine.Instance.GetBaseDirectory(GameType.ARMA2OA), "expansion"));
+                            }
+                            else
+                            {
+                                ParameterString.Append("\"-mod=");
+                            }
+
                             foreach (String ModEntry in pSettings.ModList)
                             {
                                 ParameterString.AppendFormat("{0};", Path.Combine(LocalMachine.Instance.GetModDirectory(GameType.ARMA2OA), ModEntry));
