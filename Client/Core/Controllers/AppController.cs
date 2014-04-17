@@ -151,6 +151,13 @@ namespace Client.Core.Controllers
         {
             try
             {
+                // Check the paths.
+                if (!LocalMachine.Instance.PathsSet(CurrentServer.Type))
+                {
+                    System.Windows.MessageBox.Show("Please set the game and mod paths for this game.\nIf the game is a steam version - please set the steam path as well.");
+                    return;
+                }
+
                 switch (ApplicationState)
                 {
                     case AppState.CHECK:
@@ -205,7 +212,7 @@ namespace Client.Core.Controllers
                     // Display update frame
                     ApplicationState = AppState.CHECK;
                     SetAppState(AppState.CHECK);
-                    SetBrowserTarget(NetworkUtilities.GetHttpMirror(CurrentServer.ChangelogURLList).Result);
+                    //SetBrowserTarget(NetworkUtilities.GetHttpMirror(CurrentServer.ChangelogURLList).Result);
                 }
             }
             catch(Exception ex)
@@ -351,13 +358,6 @@ namespace Client.Core.Controllers
         {
             try
             {
-                // Check the paths.
-                if (!LocalMachine.Instance.PathsSet(CurrentServer.Type))
-                {
-                    System.Windows.MessageBox.Show("Please set the game and mod paths for this game.\nIf the game is a steam version - please set the steam path as well.");
-                    return;
-                }
-
                 // Set app state to CANCELCHECK
                 SetAppState(AppState.CANCELCHECK);
 

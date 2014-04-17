@@ -247,15 +247,15 @@ namespace Client.Core.Utilities
                 switch(pGameType)
                 {
                     case GameType.STEAM:
-                        return Path.GetDirectoryName(SteamPath);
+                        return !SteamPath.Equals(String.Empty) ? Path.GetDirectoryName(SteamPath) : String.Empty;
                     case GameType.ARMA2:
-                        return Path.GetDirectoryName(A2Path);
+                        return !A2Path.Equals(String.Empty) ? Path.GetDirectoryName(A2Path) : String.Empty;
                     case GameType.ARMA2OA:
-                        return Path.GetDirectoryName(A2OAPath);
+                        return !A2OAPath.Equals(String.Empty) ? Path.GetDirectoryName(A2OAPath) : String.Empty;
                     case GameType.ARMA2OABETA:
-                        return Path.GetDirectoryName(A2OABetaPath);
+                        return !A2OABetaPath.Equals(String.Empty) ? Path.GetDirectoryName(A2OABetaPath) : String.Empty;
                     case GameType.ARMA3:
-                        return Path.GetDirectoryName(A3Path);
+                        return !A3Path.Equals(String.Empty) ? Path.GetDirectoryName(A3Path) : String.Empty;
                     default:
                         throw new NotImplementedException();
                 }
@@ -342,22 +342,22 @@ namespace Client.Core.Utilities
                     case GameType.ARMA2:
                         if (!GetBaseDirectory(GameType.ARMA2).Equals(String.Empty))
                         {
-                            return Directory.GetFiles(GetBaseDirectory(GameType.ARMA2)).Length != 0;
+                            return Directory.GetFiles(GetBaseDirectory(GameType.ARMA2), "*.vdf", SearchOption.AllDirectories).Length != 0;
                         }
                         else
                         {
-                            throw new ArgumentNullException();
+                            return false;
                         }
 
                     case GameType.ARMA2OA:
                     case GameType.ARMA2OABETA:
                         if (!GetBaseDirectory(GameType.ARMA2OA).Equals(String.Empty))
                         {
-                            return Directory.GetFiles(GetBaseDirectory(GameType.ARMA2OA)).Length != 0;
+                            return Directory.GetFiles(GetBaseDirectory(GameType.ARMA2OA), "*.vdf", SearchOption.AllDirectories).Length != 0;
                         }
                         else
                         {
-                            throw new ArgumentNullException();
+                            return false;
                         }
 
                     case GameType.ARMA3:
@@ -419,7 +419,6 @@ namespace Client.Core.Utilities
                             // Never gonna happen.
                             return (!A3Path.Equals(String.Empty) && !A3AddonPath.Equals(String.Empty));
                         }
-                        break;
 
                     default:
                         throw new NotImplementedException();

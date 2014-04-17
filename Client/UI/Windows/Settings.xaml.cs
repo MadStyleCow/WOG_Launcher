@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Client.Core.Utilities;
+using System.IO;
 
 namespace Client.UI.Windows
 {
@@ -48,10 +39,18 @@ namespace Client.UI.Windows
 
                     case "eA2Button":
                         this.eArma2.Text = dialog.FileName;
+                        if (eArma2_Mod.Text.Equals(String.Empty))
+                        {
+                            this.eArma2_Mod.Text = Path.GetDirectoryName(dialog.FileName);
+                        }
                         break;
 
                     case "eA2OAButton":
                         this.eArma2OA.Text = dialog.FileName;
+                        if (eArma2OA_Mod.Text.Equals(String.Empty))
+                        {
+                            this.eArma2OA_Mod.Text = Path.GetDirectoryName(dialog.FileName);
+                        }
                         break;
 
                     case "eA2OABetaButton":
@@ -60,6 +59,10 @@ namespace Client.UI.Windows
 
                     case "eA3Button":
                         this.eArma3.Text = dialog.FileName;
+                        if (eArma3_Mod.Text.Equals(String.Empty))
+                        {
+                            this.eArma3_Mod.Text = Path.GetDirectoryName(dialog.FileName);
+                        }
                         break;
 
                     default:
@@ -117,6 +120,16 @@ namespace Client.UI.Windows
 
         private void eOK_Click(object sender, RoutedEventArgs e)
         {
+            LocalMachine.Instance.SteamPath = eSteam.Text;
+            LocalMachine.Instance.A2Path = eArma2.Text;
+            LocalMachine.Instance.A2OAPath = eArma2OA.Text;
+            LocalMachine.Instance.A2OABetaPath = eArma2OABeta.Text;
+            LocalMachine.Instance.A3Path = eArma3.Text;
+
+            LocalMachine.Instance.A2AddonPath = eArma2_Mod.Text;
+            LocalMachine.Instance.A2OAAddonPath = eArma2OA_Mod.Text;
+            LocalMachine.Instance.A3AddonPath = eArma3_Mod.Text;
+
             LocalMachine.Instance.Save();
             this.Close();
         }
