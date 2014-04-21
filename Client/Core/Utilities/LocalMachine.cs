@@ -215,29 +215,16 @@ namespace Client.Core.Utilities
             {
                 switch(pGameType)
                 {
-<<<<<<< HEAD
                     case GameType.Steam:
-                        return Path.GetDirectoryName(SteamPath);
-                    case GameType.Arma2:
-                        return Path.GetDirectoryName(A2Path);
-                    case GameType.Arma2Oa:
-                        return Path.GetDirectoryName(A2OaPath);
-                    case GameType.Arma2Oabeta:
-                        return Path.GetDirectoryName(A2OaBetaPath);
-                    case GameType.Arma3:
-                        return Path.GetDirectoryName(A3Path);
-=======
-                    case GameType.STEAM:
                         return !SteamPath.Equals(String.Empty) ? Path.GetDirectoryName(SteamPath) : String.Empty;
-                    case GameType.ARMA2:
+                    case GameType.Arma2:
                         return !A2Path.Equals(String.Empty) ? Path.GetDirectoryName(A2Path) : String.Empty;
-                    case GameType.ARMA2OA:
-                        return !A2OAPath.Equals(String.Empty) ? Path.GetDirectoryName(A2OAPath) : String.Empty;
-                    case GameType.ARMA2OABETA:
-                        return !A2OABetaPath.Equals(String.Empty) ? Path.GetDirectoryName(A2OABetaPath) : String.Empty;
-                    case GameType.ARMA3:
+                    case GameType.Arma2Oa:
+                        return !A2OaPath.Equals(String.Empty) ? Path.GetDirectoryName(A2OaPath) : String.Empty;
+                    case GameType.Arma2Oabeta:
+                        return !A2OaBetaPath.Equals(String.Empty) ? Path.GetDirectoryName(A2OaBetaPath) : String.Empty;
+                    case GameType.Arma3:
                         return !A3Path.Equals(String.Empty) ? Path.GetDirectoryName(A3Path) : String.Empty;
->>>>>>> bf267f3e6e2eef82ba50a14bed8e67c82da24a15
                     default:
                         throw new NotImplementedException();
                 }
@@ -324,39 +311,20 @@ namespace Client.Core.Utilities
             {
                 switch (pGameType)
                 {
-<<<<<<< HEAD
                     case GameType.Arma2:
                         if (!GetBaseDirectory(GameType.Arma2).Equals(String.Empty))
                         {
-                            return Directory.GetFiles(GetBaseDirectory(GameType.Arma2)).Length != 0;
-=======
-                    case GameType.ARMA2:
-                        if (!GetBaseDirectory(GameType.ARMA2).Equals(String.Empty))
-                        {
-                            return Directory.GetFiles(GetBaseDirectory(GameType.ARMA2), "*.vdf", SearchOption.AllDirectories).Length != 0;
+                            return Directory.GetFiles(GetBaseDirectory(GameType.Arma2), "*.vdf", SearchOption.AllDirectories).Length != 0;
                         }
-                        else
-                        {
-                            return false;
->>>>>>> bf267f3e6e2eef82ba50a14bed8e67c82da24a15
-                        }
-                        throw new ArgumentNullException();
+                        return false;
 
                     case GameType.Arma2Oa:
                     case GameType.Arma2Oabeta:
                         if (!GetBaseDirectory(GameType.Arma2Oa).Equals(String.Empty))
                         {
-<<<<<<< HEAD
-                            return Directory.GetFiles(GetBaseDirectory(GameType.Arma2Oa)).Length != 0;
-=======
-                            return Directory.GetFiles(GetBaseDirectory(GameType.ARMA2OA), "*.vdf", SearchOption.AllDirectories).Length != 0;
+                            return Directory.GetFiles(GetBaseDirectory(GameType.Arma2Oa), "*.vdf", SearchOption.AllDirectories).Length != 0;
                         }
-                        else
-                        {
-                            return false;
->>>>>>> bf267f3e6e2eef82ba50a14bed8e67c82da24a15
-                        }
-                        throw new ArgumentNullException();
+                        return false;
 
                     case GameType.Arma3:
                         return true;
@@ -404,16 +372,9 @@ namespace Client.Core.Utilities
                         {
                             return (!A3Path.Equals(String.Empty) && !SteamPath.Equals(String.Empty) && !A3AddonPath.Equals(String.Empty));
                         }
-<<<<<<< HEAD
+
                         // Never gonna happen.
                         return (!A3Path.Equals(String.Empty) && !A3AddonPath.Equals(String.Empty));
-=======
-                        else
-                        {
-                            // Never gonna happen.
-                            return (!A3Path.Equals(String.Empty) && !A3AddonPath.Equals(String.Empty));
-                        }
->>>>>>> bf267f3e6e2eef82ba50a14bed8e67c82da24a15
 
                     default:
                         throw new NotImplementedException();
