@@ -140,6 +140,13 @@ namespace Client.Core.Controllers
         {
             try
             {
+                // Check the paths.
+                if (!LocalMachine.Instance.PathsSet(CurrentServer.Type))
+                {
+                    System.Windows.MessageBox.Show("Please set the game and mod paths for this game.\nIf the game is a steam version - please set the steam path as well.");
+                    return;
+                }
+
                 switch (ApplicationState)
                 {
                     case AppState.Check:
@@ -193,9 +200,15 @@ namespace Client.Core.Controllers
                 {
                     // All's not well
                     // Display update frame
+<<<<<<< HEAD
                     ApplicationState = AppState.Check;
                     SetApplicationState(AppState.Check);
                     SetBrowserTarget(NetworkUtilities.GetHttpMirror(CurrentServer.ChangelogUrlList).Result);
+=======
+                    ApplicationState = AppState.CHECK;
+                    SetAppState(AppState.CHECK);
+                    //SetBrowserTarget(NetworkUtilities.GetHttpMirror(CurrentServer.ChangelogURLList).Result);
+>>>>>>> bf267f3e6e2eef82ba50a14bed8e67c82da24a15
                 }
             }
             catch(Exception ex)
@@ -340,9 +353,29 @@ namespace Client.Core.Controllers
 
             try
             {
+<<<<<<< HEAD
                 if (LocalMachine.Instance.PathsSet(CurrentServer.Type))
                 {
                     SetApplicationState(AppState.Cancelcheck);
+=======
+                // Set app state to CANCELCHECK
+                SetAppState(AppState.CANCELCHECK);
+
+                // Receive manifests if needed.
+                if (CurrentServer.BaseManifestURL == null)
+                {
+                    CurrentServer.BaseManifestURL = await NetworkUtilities.GetFtpMirror(CurrentServer.ManifestURLList);
+                    await CurrentServer.GetAddonList(CurrentServer.BaseManifestURL);
+                }
+
+                // Go through each file and check whether it is present
+                Int32 Counter = 0;
+
+                Parallel.ForEach(CurrentServer.AddonList, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount, CancellationToken = TokenSource.Token }, file =>
+                {
+                    // Check the status of the addon
+                    file.CheckAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.ConfigExtensionList).Wait();
+>>>>>>> bf267f3e6e2eef82ba50a14bed8e67c82da24a15
 
                     if (CurrentServer.BaseManifestUrl == null)
                     {

@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Windows;
+<<<<<<< HEAD
 using System.Windows.Forms;
 using Client.Core.Utilities;
 using Button = System.Windows.Controls.Button;
+=======
+using System.Windows.Controls;
+using Client.Core.Utilities;
+using System.IO;
+>>>>>>> bf267f3e6e2eef82ba50a14bed8e67c82da24a15
 
 namespace Client.UI.Windows
 {
@@ -32,11 +38,27 @@ namespace Client.UI.Windows
                         break;
 
                     case "eA2Button":
+<<<<<<< HEAD
                         EArma2.Text = dialog.FileName;
                         break;
 
                     case "eA2OAButton":
                         EArma2Oa.Text = dialog.FileName;
+=======
+                        this.eArma2.Text = dialog.FileName;
+                        if (eArma2_Mod.Text.Equals(String.Empty))
+                        {
+                            this.eArma2_Mod.Text = Path.GetDirectoryName(dialog.FileName);
+                        }
+                        break;
+
+                    case "eA2OAButton":
+                        this.eArma2OA.Text = dialog.FileName;
+                        if (eArma2OA_Mod.Text.Equals(String.Empty))
+                        {
+                            this.eArma2OA_Mod.Text = Path.GetDirectoryName(dialog.FileName);
+                        }
+>>>>>>> bf267f3e6e2eef82ba50a14bed8e67c82da24a15
                         break;
 
                     case "eA2OABetaButton":
@@ -44,7 +66,15 @@ namespace Client.UI.Windows
                         break;
 
                     case "eA3Button":
+<<<<<<< HEAD
                         EArma3.Text = dialog.FileName;
+=======
+                        this.eArma3.Text = dialog.FileName;
+                        if (eArma3_Mod.Text.Equals(String.Empty))
+                        {
+                            this.eArma3_Mod.Text = Path.GetDirectoryName(dialog.FileName);
+                        }
+>>>>>>> bf267f3e6e2eef82ba50a14bed8e67c82da24a15
                         break;
 
                     default:
@@ -95,6 +125,7 @@ namespace Client.UI.Windows
 
         private void eOK_Click(object sender, RoutedEventArgs e)
         {
+<<<<<<< HEAD
             LocalMachine.Instance.SteamPath = ESteam.Text;
             LocalMachine.Instance.A2Path = EArma2.Text;
             LocalMachine.Instance.A2AddonPath = EArma2Mod.Text;
@@ -103,6 +134,17 @@ namespace Client.UI.Windows
             LocalMachine.Instance.A2OaAddonPath = EArma2OaMod.Text;
             LocalMachine.Instance.A3Path = EArma3.Text;
             LocalMachine.Instance.A3AddonPath = EArma3Mod.Text;
+=======
+            LocalMachine.Instance.SteamPath = eSteam.Text;
+            LocalMachine.Instance.A2Path = eArma2.Text;
+            LocalMachine.Instance.A2OAPath = eArma2OA.Text;
+            LocalMachine.Instance.A2OABetaPath = eArma2OABeta.Text;
+            LocalMachine.Instance.A3Path = eArma3.Text;
+
+            LocalMachine.Instance.A2AddonPath = eArma2_Mod.Text;
+            LocalMachine.Instance.A2OAAddonPath = eArma2OA_Mod.Text;
+            LocalMachine.Instance.A3AddonPath = eArma3_Mod.Text;
+>>>>>>> bf267f3e6e2eef82ba50a14bed8e67c82da24a15
 
             LocalMachine.Instance.Save();
             Close();
