@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Serialization;
 using Client.Core.Enums;
 using Client.Core.Utilities;
@@ -18,10 +17,9 @@ namespace Client.Core.Classes
         public GameType Type;
         public String Name;
         public Int32 ThreadCount;
-        public List<String> ManifestURLList;
-        public List<String> ChangelogURLList;
+        public List<String> ManifestUrlList;
+        public List<String> ChangelogUrlList;
         public List<String> ConfigExtensionList;
-        public Boolean Beta;
         public String Hostname;
         public Int32 Port;
         public String Password;
@@ -33,107 +31,112 @@ namespace Client.Core.Classes
         [XmlIgnore]
         public List<String> FileList;
         [XmlIgnore]
-        public String BaseManifestURL;
+        public String BaseManifestUrl;
 
         /* Public methods */
-        public async Task GetAddonList(String pManifestURL)
+        public async Task GetData(String pManifestUrl)
         {
-            String ServerManifestTemp = Path.GetTempFileName();
-            String ServerAddonListTemp = Path.GetTempFileName();
-            String ServerModListTemp = Path.GetTempFileName();
+            var serverManifestTemp = Path.GetTempFileName();
+            var serverAddonListTemp = Path.GetTempFileName();
+            var serverModListTemp = Path.GetTempFileName();
 
             try
             {
                 // Download files
-                await Utilities.NetworkUtilities.DownloadToFile(pManifestURL, ServerManifestTemp);
+                await NetworkUtilities.DownloadToFile(pManifestUrl, serverManifestTemp);
 
                 // Extract files
-                await Utilities.FileUtilities.ExtractArchive(ServerManifestTemp, @"addons/Addons.xml", ServerAddonListTemp);
-                await Utilities.FileUtilities.ExtractArchive(ServerManifestTemp, @"addons/Mods.xml", ServerModListTemp);
+                await FileUtilities.ExtractArchive(serverManifestTemp, @"addons/Addons.xml", serverAddonListTemp);
+                await FileUtilities.ExtractArchive(serverManifestTemp, @"addons/Mods.xml", serverModListTemp);
 
                 // Serialize them
-                DSServer DSAddonServer = new DSServer()
+                var dsAddonServer = new DSServer
                 {
-                    Addons = ((DSServer)Utilities.XMLSerializer.XmlDeserializeFromFile(ServerAddonListTemp, typeof(DSServer))).Addons,
-                    Mods = ((DSServer)Utilities.XMLSerializer.XmlDeserializeFromFile(ServerModListTemp, typeof(DSServer))).Mods
+                    Addons = ((DSServer)XMLSerializer.XmlDeserializeFromFile(serverAddonListTemp, typeof(DSServer))).Addons,
+                    Mods = ((DSServer)XMLSerializer.XmlDeserializeFromFile(serverModListTemp, typeof(DSServer))).Mods
                 };
 
                 // Assign values
-                AddonList = Utilities.Converters.ToAddonList(DSAddonServer.Addons, pManifestURL.Substring(0, pManifestURL.LastIndexOf('/')));
-                ModList = Utilities.Converters.ToModList(DSAddonServer.Mods);
+                AddonList = Converters.ToAddonList(dsAddonServer.Addons);
+                ModList = Converters.ToModList(dsAddonServer.Mods);
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
             finally
             {
-                if (File.Exists(ServerManifestTemp))
+                if (File.Exists(serverManifestTemp))
                 {
-                    File.Delete(ServerManifestTemp);
+                    File.Delete(serverManifestTemp);
                 }
 
-                if (File.Exists(ServerAddonListTemp))
+                if (File.Exists(serverAddonListTemp))
                 {
-                    File.Delete(ServerAddonListTemp);
+                    File.Delete(serverAddonListTemp);
                 }
 
-                if (File.Exists(ServerModListTemp))
+                if (File.Exists(serverModListTemp))
                 { 
-                    File.Delete(ServerModListTemp);
+                    File.Delete(serverModListTemp);
                 }
             }
         }
 
-        public bool UpToDate()
+        public async Task<Boolean> AddonSetValid()
         {
-            // TODO Check if any files are to be deleted.
-            if (AddonList == null || FileList == null)
-                return false;
-
-            if (AddonList.Any(p => !p.Status) || FileList.Count != 0)
-                return false;
-
-            return true;
+            if ((AddonList != null) && (FileList != null))
+            {
+                if (AddonList.Any(p => !p.Status) || !FileList.Count.Equals(0))
+                {
+                    return false;
+                }
+                return true;
+            }
+            return false;
         }
 
-        public List<String> GetFileList()
+        public async Task<List<String>> GetFileDeleteList()
         {
             // Set base directory
-            Directory.SetCurrentDirectory(LocalMachine.Instance.GetBaseDirectory(this.Type));
+            Directory.SetCurrentDirectory(LocalMachine.Instance.GetBaseDirectory(Type));
 
             // Prepare
-            List<String> FileSystemEntries = new List<string>();
+            var fileSystemEntries = new List<string>();
 
-            foreach (Mod ServerMod in ModList)
+            foreach (var serverMod in ModList)
             {
-                if (Directory.Exists(ServerMod.Name))
+                if (Directory.Exists(serverMod.Name))
                 {
-                    foreach (String EntryPath in Directory.GetFileSystemEntries(ServerMod.Name, "*", SearchOption.AllDirectories))
+                    foreach (var entryPath in Directory.GetFileSystemEntries(serverMod.Name, "*", SearchOption.AllDirectories))
                     {
-                        FileAttributes Attributes = File.GetAttributes(EntryPath);
+                        var attributes = File.GetAttributes(entryPath);
 
-                        if ((Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+                        if ((attributes & FileAttributes.Directory) == FileAttributes.Directory)
                         {
                             // If Directory
-                            if(!AddonList.Any(p => p.RelativePath.ToLowerInvariant().Contains(EntryPath.ToLowerInvariant())))
+                            if(!AddonList.Any(p => p.RelativePath.ToLowerInvariant().Contains(entryPath.ToLowerInvariant())))
                             {
-                                FileSystemEntries.Add(EntryPath);
+                                fileSystemEntries.Add(entryPath);
                             }
                         }
                         else
                         {
                             // If file
-                            if (!AddonList.Any(p => p.RelativePath.StartsWith(Path.GetDirectoryName(EntryPath), StringComparison.InvariantCultureIgnoreCase)) || !AddonList.Any(p => p.Name.ToLowerInvariant() == Path.GetFileName(EntryPath).ToLowerInvariant()))
+                            if (!AddonList.Any(p => p.RelativePath.StartsWith(Path.GetDirectoryName(entryPath), StringComparison.InvariantCultureIgnoreCase)) || !AddonList.Any(p =>
                             {
-                                FileSystemEntries.Add(EntryPath);
+                                var fileName = Path.GetFileName(entryPath);
+                                return fileName != null && p.Name.ToLowerInvariant() == fileName.ToLowerInvariant();
+                            }))
+                            {
+                                fileSystemEntries.Add(entryPath);
                             }
                         }
                     }
                 }
             }
 
-            return FileSystemEntries;
+            return fileSystemEntries;
         }
     }
 }

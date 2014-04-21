@@ -7,7 +7,7 @@ using Updater.Enums;
 
 namespace Updater.Classes
 {
-    [Serializable()]
+    [Serializable]
     public class ApplicationFile
     {
         /* Fields */
@@ -16,8 +16,5 @@ namespace Updater.Classes
         public Int32 Version { get; set; }
         public List<String> URL { get; set; }
         public FileType Type { get; set; }
-
-        /* Constructors */
-        public ApplicationFile() { }
     }
 }

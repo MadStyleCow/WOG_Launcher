@@ -1,45 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Client.Core.Classes;
 
 namespace Client.Core.Utilities
 {
     public static class Converters
     {
-        public static List<Addon> ToAddonList(DSServerAddons[] pDSAddonArray, String pBaseURL)
+        public static List<Addon> ToAddonList(IEnumerable<DSServerAddons> pDsAddonArray)
         {
-            List<Addon> ServerAddonList = new List<Addon>();
-
-            foreach (DSServerAddons DSAddon in pDSAddonArray)
+            return pDsAddonArray.Select(dsAddon => new Addon
             {
-                ServerAddonList.Add(new Addon()
-                    {
-                        Name = DSAddon.Pbo,
-                        Hash = DSAddon.Md5,
-                        Size = DSAddon.Size,
-                        RelativePath = DSAddon.Path,
-                        AbsoluteURL = String.Format("{0}/{1}", pBaseURL, DSAddon.Url),
-                        Status = false
-                    }); 
-            }
-            return ServerAddonList;
+                Name = dsAddon.Pbo, Hash = dsAddon.Md5, Size = dsAddon.Size, RelativePath = dsAddon.Path, RelativeUrl = dsAddon.Url, Status = false
+            }).ToList();
         }
 
-        public static List<Mod> ToModList(DSServerMods[] pDSModArray)
+        public static List<Mod> ToModList(IEnumerable<DSServerMods> pDsModArray)
         {
-            List<Mod> ServerModList = new List<Mod>();
-
-            foreach (DSServerMods DSMod in pDSModArray)
+            return pDsModArray.Select(dsMod => new Mod
             {
-                ServerModList.Add(new Mod()
-                    {
-                        Name = DSMod.Name
-                    });
-            }
-            return ServerModList;
+                Name = dsMod.Name
+            }).ToList();
         }
     }
 }

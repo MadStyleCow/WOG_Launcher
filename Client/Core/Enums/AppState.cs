@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Client.Core.Enums
 {
     public enum AppState
     {
-        INIT,
-        CHECK,
-        CANCELCHECK,
-        UPDATE,
-        CANCELUPDATE,
-        PLAY,
-        CLOSE
+        Init,
+        Check,
+        Cancelcheck,
+        Update,
+        Cancelupdate,
+        Play,
+        Close
     }
 }

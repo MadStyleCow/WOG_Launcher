@@ -1,17 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Client.Core.Utilities.Classes;
 
 namespace Client.UI.Pages
@@ -19,7 +11,7 @@ namespace Client.UI.Pages
     /// <summary>
     /// Interaction logic for Launcher.xaml
     /// </summary>
-    public partial class Launcher : Page
+    public partial class Launcher
     {
         /* Fields */
         Guid CurrentServer { get; set; }
@@ -31,15 +23,15 @@ namespace Client.UI.Pages
         }
 
         /* UI Access */
-        public void SetModFolderList(List<String> pFolderList)
+        public void SetModFolderList(IEnumerable<string> pFolderList)
         {
-            foreach(String Folder in pFolderList)
+            foreach(var folder in pFolderList)
             {
-                eMods.Items.Add(new CheckBox()
-                    {
-                        Content = new TextBlock()
+                EMods.Items.Add(new CheckBox
+                {
+                        Content = new TextBlock
                         {
-                             Text = Folder
+                             Text = folder
                         }
                     });
             }
@@ -49,33 +41,33 @@ namespace Client.UI.Pages
         {
             CurrentServer = pEntry.ServerIdKey;
 
-            foreach (String Mod in pEntry.ModList)
+            foreach (var mod in pEntry.ModList)
             {
-                foreach (CheckBox Item in eMods.Items)
+                foreach (CheckBox item in EMods.Items)
                 {
-                    if (((TextBlock)Item.Content).Text.ToLowerInvariant().Equals(Mod.ToLowerInvariant()))
+                    if (((TextBlock)item.Content).Text.ToLowerInvariant().Equals(mod.ToLowerInvariant()))
                     {
-                        Item.IsChecked = true;
+                        item.IsChecked = true;
                     }
                 }
             }
 
-            eSkipIntro.IsChecked = pEntry.NoSplash;
-            eShowScriptErrors.IsChecked = pEntry.ShowScriptErrors;
-            eWinXP.IsChecked = pEntry.WinXP;
-            eWindowMode.IsChecked = pEntry.Windowed;
-            eEmptyWorld.IsChecked = pEntry.EmptyWorld;
-            eCpuCountCheck.IsChecked = pEntry.CpuCountChecked;
-            if (eCpuCountCheck.IsChecked == true)
-                eCpuCount.Text = pEntry.CpuCount.ToString();
-            eMaxMemoryCheck.IsChecked = pEntry.MaxMemoryChecked;
-            if (eMaxMemoryCheck.IsChecked == true)
-                eMaxMemory.Text = pEntry.MaxMemory.ToString();
-            eExThreadsCheck.IsChecked = pEntry.ExThreadsChecked;
-            if (eExThreadsCheck.IsChecked == true)
-                eExThreads.Text = pEntry.ExThreads.ToString();
-            eAdditionalParameters.Text = pEntry.AdditionalParameters;
-            eConnect.IsChecked = pEntry.AutoConnect;
+            ESkipIntro.IsChecked = pEntry.NoSplash;
+            EShowScriptErrors.IsChecked = pEntry.ShowScriptErrors;
+            EWinXp.IsChecked = pEntry.WinXp;
+            EWindowMode.IsChecked = pEntry.Windowed;
+            EEmptyWorld.IsChecked = pEntry.EmptyWorld;
+            ECpuCountCheck.IsChecked = pEntry.CpuCountChecked;
+            if (ECpuCountCheck.IsChecked == true)
+                ECpuCount.Text = pEntry.CpuCount.ToString(CultureInfo.InvariantCulture);
+            EMaxMemoryCheck.IsChecked = pEntry.MaxMemoryChecked;
+            if (EMaxMemoryCheck.IsChecked == true)
+                EMaxMemory.Text = pEntry.MaxMemory.ToString(CultureInfo.InvariantCulture);
+            EExThreadsCheck.IsChecked = pEntry.ExThreadsChecked;
+            if (EExThreadsCheck.IsChecked == true)
+                EExThreads.Text = pEntry.ExThreads.ToString(CultureInfo.InvariantCulture);
+            EAdditionalParameters.Text = pEntry.AdditionalParameters;
+            EConnect.IsChecked = pEntry.AutoConnect;
         }
 
         public SettingsCacheEntry GetSettings()
@@ -83,70 +75,62 @@ namespace Client.UI.Pages
             try
             {
                 // Get list of selected mods
-                List<String> ModList = new List<string>();
+                var modList = (from CheckBox item in EMods.Items where item.IsChecked == true select ((TextBlock) item.Content).Text).ToList();
 
-                foreach (CheckBox Item in eMods.Items)
-                {
-                    if (Item.IsChecked == true)
-                    {
-                        ModList.Add(((TextBlock)Item.Content).Text);
-                    }
-                }
-
-                return new SettingsCacheEntry()
+                return new SettingsCacheEntry
                 {
                     ServerIdKey = CurrentServer,
-                    AutoConnect = (eConnect.IsChecked == true),
-                    Windowed = (eWindowMode.IsChecked == true),
-                    ShowScriptErrors = (eShowScriptErrors.IsChecked == true),
-                    WinXP = (eWinXP.IsChecked == true),
-                    EmptyWorld = (eEmptyWorld.IsChecked == true),
-                    CpuCountChecked = (eCpuCountCheck.IsChecked == true),
-                    MaxMemoryChecked = (eMaxMemoryCheck.IsChecked == true),
-                    ExThreadsChecked = (eExThreadsCheck.IsChecked == true),
-                    NoSplash = (eSkipIntro.IsChecked == true),
-                    ModList = ModList,
-                    ExThreads = Convert.ToInt32(eExThreads.Text),
-                    CpuCount = Convert.ToInt32(eCpuCount.Text),
-                    MaxMemory = Convert.ToInt32(eMaxMemory.Text),
-                    AdditionalParameters = eAdditionalParameters.Text
+                    AutoConnect = (EConnect.IsChecked == true),
+                    Windowed = (EWindowMode.IsChecked == true),
+                    ShowScriptErrors = (EShowScriptErrors.IsChecked == true),
+                    WinXp = (EWinXp.IsChecked == true),
+                    EmptyWorld = (EEmptyWorld.IsChecked == true),
+                    CpuCountChecked = (ECpuCountCheck.IsChecked == true),
+                    MaxMemoryChecked = (EMaxMemoryCheck.IsChecked == true),
+                    ExThreadsChecked = (EExThreadsCheck.IsChecked == true),
+                    NoSplash = (ESkipIntro.IsChecked == true),
+                    ModList = modList,
+                    ExThreads = Convert.ToInt32(EExThreads.Text),
+                    CpuCount = Convert.ToInt32(ECpuCount.Text),
+                    MaxMemory = Convert.ToInt32(EMaxMemory.Text),
+                    AdditionalParameters = EAdditionalParameters.Text
                 };
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
         /* UI Event Handlers */
         private void eCpuCountCheck_Checked(object sender, RoutedEventArgs e)
         {
-            eCpuCount.IsEnabled = true;
+            ECpuCount.IsEnabled = true;
         }
 
         private void eCpuCountCheck_Unchecked(object sender, RoutedEventArgs e)
         {
-            eCpuCount.IsEnabled = false;
+            ECpuCount.IsEnabled = false;
         }
 
         private void eMaxMemoryCheck_Checked(object sender, RoutedEventArgs e)
         {
-            eMaxMemory.IsEnabled = true;
+            EMaxMemory.IsEnabled = true;
         }
 
         private void eMaxMemoryCheck_Unchecked(object sender, RoutedEventArgs e)
         {
-            eMaxMemory.IsEnabled = false;
+            EMaxMemory.IsEnabled = false;
         }
 
         private void eExThreadsCheck_Checked(object sender, RoutedEventArgs e)
         {
-            eExThreads.IsEnabled = true;
+            EExThreads.IsEnabled = true;
         }
 
         private void eExThreadsCheck_Unchecked(object sender, RoutedEventArgs e)
         {
-            eExThreads.IsEnabled = false;
+            EExThreads.IsEnabled = false;
         }
     }
 }

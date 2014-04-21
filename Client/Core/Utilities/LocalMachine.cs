@@ -1,62 +1,65 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Win32;
 using Client.Core.Enums;
+using Client.Properties;
+using log4net;
+using Microsoft.Win32;
 
 namespace Client.Core.Utilities
 {
     public class LocalMachine
     {
+        /* Loggers */
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ApplicationUpdater));
+
         /* Static fields */
-        public static LocalMachine Instance = new LocalMachine();
+        public static readonly LocalMachine Instance = new LocalMachine();
 
         /* Public fields */
-        public OperatingSystem OS   { get; private set; }
+        public OperatingSystem Os   { get; private set; }
         public Int32 CpuCount       { get; private set; }
 
         // Paths should store the way to the executable
         public String A2Path        { get; set; }
-        public String A2OAPath      { get; set; }    
-        public String A2OABetaPath  { get; set; }
+        public String A2OaPath      { get; set; }    
+        public String A2OaBetaPath  { get; set; }
         public String A3Path        { get; set; }        
         public String SteamPath     { get; set; }
 
         // Paths should store only the folder
         public String A2AddonPath   { get; set; }
-        public String A2OAAddonPath { get; set; }
+        public String A2OaAddonPath { get; set; }
         public String A3AddonPath   { get; set; }
 
         /* Private fields */
-        List<String> SteamRegistryKeys  = new List<string>()    { @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Valve\Steam",                           @"HKEY_LOCAL_MACHINE\SOFTWARE\Valve\Steam"};
-        List<String> A2RegistryKeys     = new List<string>()    { @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Bohemia Interactive Studio\ArmA 2",     @"HKEY_LOCAL_MACHINE\SOFTWARE\Bohemia Interactive Studio\ArmA 2"};
-        List<String> A2OARegistryKeys   = new List<string>()    { @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Bohemia Interactive Studio\ArmA 2 OA",  @"HKEY_LOCAL_MACHINE\SOFTWARE\Bohemia Interactive Studio\ArmA 2 OA" };
-        List<String> A3RegistryKeys     = new List<string>()    { @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Bohemia Interactive\arma 3",            @"HKEY_LOCAL_MACHINE\SOFTWARE\Bohemia Interactive\arma 3" };
+        readonly List<String> _steamRegistryKeys  = new List<string> { @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Valve\Steam",                           @"HKEY_LOCAL_MACHINE\SOFTWARE\Valve\Steam"};
+        readonly List<String> _a2RegistryKeys     = new List<string> { @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Bohemia Interactive Studio\ArmA 2",     @"HKEY_LOCAL_MACHINE\SOFTWARE\Bohemia Interactive Studio\ArmA 2"};
+        readonly List<String> _a2OaRegistryKeys   = new List<string> { @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Bohemia Interactive Studio\ArmA 2 OA",  @"HKEY_LOCAL_MACHINE\SOFTWARE\Bohemia Interactive Studio\ArmA 2 OA" };
+        readonly List<String> _a3RegistryKeys     = new List<string> { @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Bohemia Interactive\arma 3",            @"HKEY_LOCAL_MACHINE\SOFTWARE\Bohemia Interactive\arma 3" };
 
         /* Constructors */
-        public LocalMachine()
+        private LocalMachine()
         {
             try
             {
                 // Assign local machine parameters
-                this.OS = Environment.OSVersion;
-                this.CpuCount = Environment.ProcessorCount;
+                Os = Environment.OSVersion;
+                CpuCount = Environment.ProcessorCount;
 
                 // Assign paths
-                this.SteamPath = LocateExecutablePath(GameType.STEAM);
-                this.A2Path = LocateExecutablePath(GameType.ARMA2);
-                this.A2AddonPath = LocateModPath(GameType.ARMA2);
-                this.A2OAPath = LocateExecutablePath(GameType.ARMA2OA);
-                this.A2OAAddonPath = LocateModPath(GameType.ARMA2OA);
-                this.A2OABetaPath = LocateExecutablePath(GameType.ARMA2OABETA);
-                this.A3Path = LocateExecutablePath(GameType.ARMA3);
-                this.A3AddonPath = LocateModPath(GameType.ARMA3);
+                SteamPath = LocateExecutablePath(GameType.Steam);
+                A2Path = LocateExecutablePath(GameType.Arma2);
+                A2AddonPath = LocateModPath(GameType.Arma2);
+                A2OaPath = LocateExecutablePath(GameType.Arma2Oa);
+                A2OaAddonPath = LocateModPath(GameType.Arma2Oa);
+                A2OaBetaPath = LocateExecutablePath(GameType.Arma2Oabeta);
+                A3Path = LocateExecutablePath(GameType.Arma3);
+                A3AddonPath = LocateModPath(GameType.Arma3);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Fatal("An error was encountered while trying to construct the LocalMachine class.", ex);
                 throw;
             }
         }
@@ -68,100 +71,83 @@ namespace Client.Core.Utilities
             {
                 switch(pGameType)
                 {
-                    case GameType.STEAM:
-                        if(!Properties.Settings.Default.Steam_Path.ToLowerInvariant().Equals(String.Empty))
+                    case GameType.Steam:
+                        if(!Settings.Default.Steam_Path.ToLowerInvariant().Equals(String.Empty))
                         {
-                            return Properties.Settings.Default.Steam_Path;
+                            return Settings.Default.Steam_Path;
                         }
-                        else
+                        foreach (var registryKey in _steamRegistryKeys)
                         {
-                            foreach (String RegistryKey in SteamRegistryKeys)
+                            var keyValue = (String)Registry.GetValue(registryKey, "InstallPath", "");
+                            if (keyValue != null)
                             {
-                                String KeyValue = (String)Registry.GetValue(RegistryKey, "InstallPath", "");
-                                if (KeyValue != null)
-                                {
-                                    return Path.Combine(KeyValue, "steam.exe");
-                                }
+                                return Path.Combine(keyValue, "steam.exe");
                             }
-                            return String.Empty;
                         }
+                        return String.Empty;
 
-                    case GameType.ARMA2:
-                        if(!Properties.Settings.Default.A2_Path.ToLowerInvariant().Equals(String.Empty))
+                    case GameType.Arma2:
+                        if(!Settings.Default.A2_Path.ToLowerInvariant().Equals(String.Empty))
                         {
-                            return Properties.Settings.Default.A2_Path;
+                            return Settings.Default.A2_Path;
                         }
-                        else
+                        foreach (var registryKey in _a2RegistryKeys)
                         {
-                            foreach (String RegistryKey in A2RegistryKeys)
+                            var keyValue = (String)Registry.GetValue(registryKey, "main", "");
+                            if (keyValue != null)
                             {
-                                String KeyValue = (String)Registry.GetValue(RegistryKey, "main", "");
-                                if (KeyValue != null)
-                                {
-                                    return Path.Combine(KeyValue, "arma2.exe");
-                                }
+                                return Path.Combine(keyValue, "arma2.exe");
                             }
-                            return String.Empty;
                         }
+                        return String.Empty;
 
-                    case GameType.ARMA2OA:
-                        if(!Properties.Settings.Default.A2OA_Path.ToLowerInvariant().Equals(String.Empty))
+                    case GameType.Arma2Oa:
+                        if(!Settings.Default.A2OA_Path.ToLowerInvariant().Equals(String.Empty))
                         {
-                            return Properties.Settings.Default.A2OA_Path;
+                            return Settings.Default.A2OA_Path;
                         }
-                        else
+                        foreach (var registryKey in _a2OaRegistryKeys)
                         {
-                            foreach (String RegistryKey in A2OARegistryKeys)
+                            var keyValue = (String)Registry.GetValue(registryKey, "main", "");
+                            if (keyValue != null)
                             {
-                                String KeyValue = (String)Registry.GetValue(RegistryKey, "main", "");
-                                if (KeyValue != null)
-                                {
-                                    return Path.Combine(KeyValue, "arma2oa.exe");
-                                }
+                                return Path.Combine(keyValue, "arma2oa.exe");
                             }
-                            return String.Empty;
                         }
+                        return String.Empty;
 
-                    case GameType.ARMA2OABETA:
-                        if(!Properties.Settings.Default.A2OABeta_Path.ToLowerInvariant().Equals(String.Empty))
+                    case GameType.Arma2Oabeta:
+                        if(!Settings.Default.A2OABeta_Path.ToLowerInvariant().Equals(String.Empty))
                         {
-                            return Properties.Settings.Default.A2OABeta_Path;
+                            return Settings.Default.A2OABeta_Path;
                         }
-                        else
+                        if (!A2OaAddonPath.Equals(String.Empty))
                         {
-                            if (!this.A2OAAddonPath.Equals(String.Empty))
-                            {
-                                return Path.Combine(this.A2OAAddonPath, @"Expansion\Beta\Arma2oa.exe");
-                            }
-                            else
-                            {
-                                return String.Empty;
-                            }
+                            return Path.Combine(A2OaAddonPath, @"Expansion\Beta\Arma2oa.exe");
                         }
+                        return String.Empty;
 
-                    case GameType.ARMA3:
-                        if(!Properties.Settings.Default.A3_Path.ToLowerInvariant().Equals(String.Empty))
+                    case GameType.Arma3:
+                        if(!Settings.Default.A3_Path.ToLowerInvariant().Equals(String.Empty))
                         {
-                            return Properties.Settings.Default.A3_Path;
+                            return Settings.Default.A3_Path;
                         }
-                        else
+                        foreach (var registryKey in _a3RegistryKeys)
                         {
-                            foreach (String RegistryKey in A3RegistryKeys)
+                            var keyValue = (String)Registry.GetValue(registryKey, "main", "");
+                            if (keyValue != null)
                             {
-                                String KeyValue = (String)Registry.GetValue(RegistryKey, "main", "");
-                                if (KeyValue != null)
-                                {
-                                    return Path.Combine(KeyValue, "arma3.exe");
-                                }
+                                return Path.Combine(keyValue, "arma3.exe");
                             }
-                            return String.Empty;
                         }
+                        return String.Empty;
                     default:
                         throw new NotImplementedException();
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Logger.Error("An error was encountered while trying to locate an executable path.", ex);
                 throw;
             }
         }
@@ -172,64 +158,47 @@ namespace Client.Core.Utilities
             {
                 switch(pGameType)
                 {
-                    case GameType.ARMA2:
-                        if (!Properties.Settings.Default.A2_AddonPath.ToLowerInvariant().Equals(String.Empty))
+                    case GameType.Arma2:
+                        if (!Settings.Default.A2_AddonPath.ToLowerInvariant().Equals(String.Empty))
                         {
-                            return Properties.Settings.Default.A2_AddonPath;
+                            return Settings.Default.A2_AddonPath;
                         }
-                        else
+                        if (!A2Path.Equals(String.Empty))
                         {
-                            if (!this.A2Path.Equals(String.Empty))
-                            {
-                                return Path.GetDirectoryName(this.A2Path);
-                            }
-                            else
-                            {
-                                return String.Empty;
-                            }
+                            return Path.GetDirectoryName(A2Path);
                         }
-                        
-                    case GameType.ARMA2OA:
-                    case GameType.ARMA2OABETA:
-                        if (!Properties.Settings.Default.A2OA_Addon_Path.ToLowerInvariant().Equals(String.Empty))
-                        {
-                            return Properties.Settings.Default.A2OA_Addon_Path;
-                        }
-                        else
-                        {
-                            if (!this.A2OAPath.Equals(String.Empty))
-                            {
-                                return Path.GetDirectoryName(this.A2OAPath);
-                            }
-                            else
-                            {
-                                return String.Empty;
-                            }
-                        }
+                        return String.Empty;
 
-                    case GameType.ARMA3:
-                        if (!Properties.Settings.Default.A3_Addon_Path.ToLowerInvariant().Equals(String.Empty))
+                    case GameType.Arma2Oa:
+                    case GameType.Arma2Oabeta:
+                        if (!Settings.Default.A2OA_Addon_Path.ToLowerInvariant().Equals(String.Empty))
                         {
-                            return Properties.Settings.Default.A3_Addon_Path;
+                            return Settings.Default.A2OA_Addon_Path;
                         }
-                        else
+                        if (!A2OaPath.Equals(String.Empty))
                         {
-                            if (!this.A3Path.Equals(String.Empty))
-                            {
-                                return Path.GetDirectoryName(this.A3Path);
-                            }
-                            else
-                            {
-                                return String.Empty;
-                            }
+                            return Path.GetDirectoryName(A2OaPath);
                         }
+                        return String.Empty;
+
+                    case GameType.Arma3:
+                        if (!Settings.Default.A3_Addon_Path.ToLowerInvariant().Equals(String.Empty))
+                        {
+                            return Settings.Default.A3_Addon_Path;
+                        }
+                        if (!A3Path.Equals(String.Empty))
+                        {
+                            return Path.GetDirectoryName(A3Path);
+                        }
+                        return String.Empty;
 
                     default:
                         throw new NotImplementedException();
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Logger.Error("An error was encountered while trying to locate a mod path.", ex);
                 throw;
             }
         }
@@ -246,22 +215,23 @@ namespace Client.Core.Utilities
             {
                 switch(pGameType)
                 {
-                    case GameType.STEAM:
+                    case GameType.Steam:
                         return Path.GetDirectoryName(SteamPath);
-                    case GameType.ARMA2:
+                    case GameType.Arma2:
                         return Path.GetDirectoryName(A2Path);
-                    case GameType.ARMA2OA:
-                        return Path.GetDirectoryName(A2OAPath);
-                    case GameType.ARMA2OABETA:
-                        return Path.GetDirectoryName(A2OABetaPath);
-                    case GameType.ARMA3:
+                    case GameType.Arma2Oa:
+                        return Path.GetDirectoryName(A2OaPath);
+                    case GameType.Arma2Oabeta:
+                        return Path.GetDirectoryName(A2OaBetaPath);
+                    case GameType.Arma3:
                         return Path.GetDirectoryName(A3Path);
                     default:
                         throw new NotImplementedException();
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Logger.Error("An error was encountered while trying to get the base directory.", ex);
                 throw;
             }
         }
@@ -277,22 +247,23 @@ namespace Client.Core.Utilities
             {
                 switch(pGameType)
                 {
-                    case GameType.ARMA2:
+                    case GameType.Arma2:
                         return A2AddonPath;
 
-                    case GameType.ARMA2OA:
-                    case GameType.ARMA2OABETA:
-                        return A2OAAddonPath;
+                    case GameType.Arma2Oa:
+                    case GameType.Arma2Oabeta:
+                        return A2OaAddonPath;
 
-                    case GameType.ARMA3:
+                    case GameType.Arma3:
                         return A3AddonPath;
 
                     default:
                         throw new NotImplementedException();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error("An error was encountered while trying to get the mod directory.", ex);
                 throw;
             }
         }
@@ -308,22 +279,23 @@ namespace Client.Core.Utilities
             {
                 switch (pGameType)
                 {
-                    case GameType.STEAM:
+                    case GameType.Steam:
                         return SteamPath;
-                    case GameType.ARMA2:
+                    case GameType.Arma2:
                         return A2Path;
-                    case GameType.ARMA2OA:
-                        return A2OAPath;
-                    case GameType.ARMA2OABETA:
-                        return A2OABetaPath;
-                    case GameType.ARMA3:
+                    case GameType.Arma2Oa:
+                        return A2OaPath;
+                    case GameType.Arma2Oabeta:
+                        return A2OaBetaPath;
+                    case GameType.Arma3:
                         return A3Path;
                     default:
                         throw new NotImplementedException();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error("An error was encountered while trying to get the executable path.", ex);
                 throw;
             }
         }
@@ -339,36 +311,31 @@ namespace Client.Core.Utilities
             {
                 switch (pGameType)
                 {
-                    case GameType.ARMA2:
-                        if (!GetBaseDirectory(GameType.ARMA2).Equals(String.Empty))
+                    case GameType.Arma2:
+                        if (!GetBaseDirectory(GameType.Arma2).Equals(String.Empty))
                         {
-                            return Directory.GetFiles(GetBaseDirectory(GameType.ARMA2)).Length != 0;
+                            return Directory.GetFiles(GetBaseDirectory(GameType.Arma2)).Length != 0;
                         }
-                        else
-                        {
-                            throw new ArgumentNullException();
-                        }
+                        throw new ArgumentNullException();
 
-                    case GameType.ARMA2OA:
-                    case GameType.ARMA2OABETA:
-                        if (!GetBaseDirectory(GameType.ARMA2OA).Equals(String.Empty))
+                    case GameType.Arma2Oa:
+                    case GameType.Arma2Oabeta:
+                        if (!GetBaseDirectory(GameType.Arma2Oa).Equals(String.Empty))
                         {
-                            return Directory.GetFiles(GetBaseDirectory(GameType.ARMA2OA)).Length != 0;
+                            return Directory.GetFiles(GetBaseDirectory(GameType.Arma2Oa)).Length != 0;
                         }
-                        else
-                        {
-                            throw new ArgumentNullException();
-                        }
+                        throw new ArgumentNullException();
 
-                    case GameType.ARMA3:
+                    case GameType.Arma3:
                         return true;
 
                     default:
                         throw new NotImplementedException();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error("An error was encountered while trying to assert steam version.", ex);
                 throw;
             }
         }
@@ -379,54 +346,42 @@ namespace Client.Core.Utilities
             {
                 switch (pGameType)
                 {
-                    case GameType.ARMA2:
-                        if (SteamVersion(GameType.ARMA2))
+                    case GameType.Arma2:
+                        if (SteamVersion(GameType.Arma2))
                         {
                             return (!A2Path.Equals(String.Empty) && !SteamPath.Equals(String.Empty) && !A2AddonPath.Equals(String.Empty));
                         }
-                        else
-                        {
-                            return (!A2Path.Equals(String.Empty));
-                        }
+                        return (!A2Path.Equals(String.Empty));
 
-                    case GameType.ARMA2OA:
-                        if(SteamVersion(GameType.ARMA2OA))
+                    case GameType.Arma2Oa:
+                        if(SteamVersion(GameType.Arma2Oa))
                         {
-                            return (!A2Path.Equals(String.Empty) && !SteamPath.Equals(String.Empty) && !A2OAPath.Equals(String.Empty) && !A2OAAddonPath.Equals(String.Empty));
+                            return (!A2Path.Equals(String.Empty) && !SteamPath.Equals(String.Empty) && !A2OaPath.Equals(String.Empty) && !A2OaAddonPath.Equals(String.Empty));
                         }
-                        else
-                        {
-                            return (!A2OAPath.Equals(String.Empty) && !A2OAAddonPath.Equals(String.Empty));
-                        }
-                        
-                    case GameType.ARMA2OABETA:
-                        if (SteamVersion(GameType.ARMA2OA))
-                        {
-                            return (!A2Path.Equals(String.Empty) && !SteamPath.Equals(String.Empty) && !A2OAPath.Equals(String.Empty) && !A2OAAddonPath.Equals(String.Empty) && !A2OABetaPath.Equals(String.Empty));
-                        }
-                        else
-                        {
-                            return (!A2OAPath.Equals(String.Empty) && !A2OAAddonPath.Equals(String.Empty));
-                        }
+                        return (!A2OaPath.Equals(String.Empty) && !A2OaAddonPath.Equals(String.Empty));
 
-                    case GameType.ARMA3:
-                        if (SteamVersion(GameType.ARMA3))
+                    case GameType.Arma2Oabeta:
+                        if (SteamVersion(GameType.Arma2Oa))
+                        {
+                            return (!A2Path.Equals(String.Empty) && !SteamPath.Equals(String.Empty) && !A2OaPath.Equals(String.Empty) && !A2OaAddonPath.Equals(String.Empty) && !A2OaBetaPath.Equals(String.Empty));
+                        }
+                        return (!A2OaPath.Equals(String.Empty) && !A2OaAddonPath.Equals(String.Empty));
+
+                    case GameType.Arma3:
+                        if (SteamVersion(GameType.Arma3))
                         {
                             return (!A3Path.Equals(String.Empty) && !SteamPath.Equals(String.Empty) && !A3AddonPath.Equals(String.Empty));
                         }
-                        else
-                        {
-                            // Never gonna happen.
-                            return (!A3Path.Equals(String.Empty) && !A3AddonPath.Equals(String.Empty));
-                        }
-                        break;
+                        // Never gonna happen.
+                        return (!A3Path.Equals(String.Empty) && !A3AddonPath.Equals(String.Empty));
 
                     default:
                         throw new NotImplementedException();
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Logger.Error("An error was encountered while trying to assert whether the paths are set.", ex);
                 throw;
             }
         }
@@ -438,18 +393,19 @@ namespace Client.Core.Utilities
         {
             try
             {
-                Properties.Settings.Default.Steam_Path      = this.SteamPath;
-                Properties.Settings.Default.A2_Path         = this.A2Path;
-                Properties.Settings.Default.A2OA_Path       = this.A2OAPath;
-                Properties.Settings.Default.A2OABeta_Path   = this.A2OABetaPath;
-                Properties.Settings.Default.A3_Path         = this.A3Path;
-                Properties.Settings.Default.A2OA_Addon_Path = this.A2OAAddonPath;
-                Properties.Settings.Default.A3_Addon_Path   = this.A3AddonPath;
+                Settings.Default.Steam_Path      = SteamPath;
+                Settings.Default.A2_Path         = A2Path;
+                Settings.Default.A2OA_Path       = A2OaPath;
+                Settings.Default.A2OABeta_Path   = A2OaBetaPath;
+                Settings.Default.A3_Path         = A3Path;
+                Settings.Default.A2OA_Addon_Path = A2OaAddonPath;
+                Settings.Default.A3_Addon_Path   = A3AddonPath;
 
-                Properties.Settings.Default.Save();
+                Settings.Default.Save();
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Logger.Error("An error was encountered while trying to save the paths.", ex);
                 throw;
             }
         }

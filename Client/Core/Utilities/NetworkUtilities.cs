@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Client.Properties;
 
 namespace Client.Core.Utilities
 {
@@ -15,24 +16,16 @@ namespace Client.Core.Utilities
         /// <returns></returns>
         public static async Task<Boolean> DownloadToFile(String pInputUrl, String pOutputPath)
         {
-            for (int CycleCount = 0; CycleCount < Properties.Settings.Default.RetryAttempts; CycleCount++)
+            for (var cycleCount = 0; cycleCount < Settings.Default.RetryAttempts; cycleCount++)
             {
                 try
                 {
                     await new WebClient().DownloadFileTaskAsync(pInputUrl, pOutputPath);
                     return true;
                 }
-                catch(OperationCanceledException)
-                {
-                    throw;
-                }
                 catch(WebException)
                 {
                     // File not accessable or timed out while trying to download. In any case - do nothing.
-                }
-                catch (Exception)
-                {
-                    throw;
                 }
             }
             return false;
@@ -45,18 +38,7 @@ namespace Client.Core.Utilities
         /// <returns>File content string</returns>
         public static async Task<String> DownloadToString(String pInputUrl)
         {
-            try
-            {
-                return await new WebClient().DownloadStringTaskAsync(pInputUrl);
-            }
-            catch(OperationCanceledException)
-            {
-                throw;
-            }
-            catch(Exception)
-            {
-                throw;
-            }
+            return await new WebClient().DownloadStringTaskAsync(pInputUrl);
         }
 
         /// <summary>
@@ -64,41 +46,38 @@ namespace Client.Core.Utilities
         /// </summary>
         /// <param name="pFtpMirrorList">List of mirrors to be tested.</param>
         /// <returns>A randomly selected, working mirror.</returns>
-        public static async Task<String> GetFtpMirror(List<String> pFtpMirrorList)
+        public static async Task<String> GetFtpMirror(IEnumerable<string> pFtpMirrorList)
         {
             try
             {
-                List<String> AvailableMirrors = new List<String>();
-                Random RandomGenerator = new Random();
+                var availableMirrors = new List<String>();
+                var randomGenerator = new Random();
 
-                foreach (String FtpMirror in pFtpMirrorList)
+                foreach (var ftpMirror in pFtpMirrorList)
                 {
-                    FtpWebRequest CheckMirrorRequest = (FtpWebRequest)WebRequest.Create(FtpMirror);
-                    CheckMirrorRequest.Method = WebRequestMethods.Ftp.GetFileSize;
-                    FtpWebResponse CheckMirrorResponse = (FtpWebResponse)CheckMirrorRequest.GetResponse();
-
-                    if (CheckMirrorResponse.StatusCode == FtpStatusCode.FileStatus)
+                    try
                     {
-                        AvailableMirrors.Add(FtpMirror);
+                        var checkMirrorRequest = (FtpWebRequest)WebRequest.Create(ftpMirror);
+                        checkMirrorRequest.Method = WebRequestMethods.Ftp.GetFileSize;
+                        var checkMirrorResponse = (FtpWebResponse)checkMirrorRequest.GetResponse();
+
+                        if (checkMirrorResponse.StatusCode == FtpStatusCode.FileStatus)
+                        {
+                            availableMirrors.Add(ftpMirror);
+                        }
+
+                        checkMirrorResponse.Close();
                     }
-
-                    CheckMirrorResponse.Close();
+                    catch (WebException) { }
                 }
 
-                if (AvailableMirrors.Count > 0)
+                if (availableMirrors.Count > 0)
                 {
-                    return AvailableMirrors[RandomGenerator.Next(0, AvailableMirrors.Count)];
+                    return availableMirrors[randomGenerator.Next(0, availableMirrors.Count)];
                 }
-                else
-                {
-                    throw new ApplicationException("No mirrors available.");
-                }
+                throw new ApplicationException("No mirrors available");
             }
-            catch(OperationCanceledException)
-            {
-                throw;
-            }
-            catch(Exception)
+            catch(Exception ex)
             {
                 throw;
             }
@@ -110,40 +89,33 @@ namespace Client.Core.Utilities
         /// </summary>
         /// <param name="pHttpMirrorList">List of mirrors to be tested.</param>
         /// <returns>A randomly selected, working mirror.</returns>
-        public static async Task<String> GetHttpMirror(List<String> pHttpMirrorList)
+        public static async Task<String> GetHttpMirror(IEnumerable<string> pHttpMirrorList)
         {
             try
             {
-                List<String> AvailableMirrors = new List<String>();
-                Random RandomGenerator = new Random();
+                var availableMirrors = new List<String>();
+                var randomGenerator = new Random();
 
-                foreach (String HttpMirror in pHttpMirrorList)
+                foreach (var httpMirror in pHttpMirrorList)
                 {
-                    HttpWebRequest CheckMirrorRequest = (HttpWebRequest)WebRequest.Create(HttpMirror);
-                    HttpWebResponse CheckMirrorResponse = (HttpWebResponse)CheckMirrorRequest.GetResponse();
+                    var checkMirrorRequest = (HttpWebRequest)WebRequest.Create(httpMirror);
+                    var checkMirrorResponse = (HttpWebResponse)checkMirrorRequest.GetResponse();
 
-                    if (CheckMirrorResponse.StatusCode == HttpStatusCode.OK)
+                    if (checkMirrorResponse.StatusCode == HttpStatusCode.OK)
                     {
-                        AvailableMirrors.Add(HttpMirror);
+                        availableMirrors.Add(httpMirror);
                     }
 
-                    CheckMirrorResponse.Close();
+                    checkMirrorResponse.Close();
                 }
 
-                if (AvailableMirrors.Count > 0)
+                if (availableMirrors.Count > 0)
                 {
-                    return AvailableMirrors[RandomGenerator.Next(0, AvailableMirrors.Count)];
+                    return availableMirrors[randomGenerator.Next(0, availableMirrors.Count)];
                 }
-                else
-                {
-                    throw new ApplicationException("No mirrors available.");
-                }
+                throw new ApplicationException("No mirrors available.");
             }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }

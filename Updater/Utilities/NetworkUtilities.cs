@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Updater.Properties;
 
 namespace Updater.Utilities
 {
@@ -15,7 +16,7 @@ namespace Updater.Utilities
         /// <returns></returns>
         public static async Task DownloadToFile(String pInputUrl, String pOutputPath)
         {
-            for (int CycleCount = 0; CycleCount < Properties.Settings.Default.RetryAttempts; CycleCount++)
+            for (var CycleCount = 0; CycleCount < Settings.Default.RetryAttempts; CycleCount++)
             {
                 try
                 {
@@ -62,14 +63,14 @@ namespace Updater.Utilities
         {
             try
             {
-                List<String> AvailableMirrors = new List<String>();
-                Random RandomGenerator = new Random();
+                var AvailableMirrors = new List<String>();
+                var RandomGenerator = new Random();
 
-                foreach (String FtpMirror in pFtpMirrorList)
+                foreach (var FtpMirror in pFtpMirrorList)
                 {
-                    FtpWebRequest CheckMirrorRequest = (FtpWebRequest)WebRequest.Create(FtpMirror);
+                    var CheckMirrorRequest = (FtpWebRequest)WebRequest.Create(FtpMirror);
                     CheckMirrorRequest.Method = WebRequestMethods.Ftp.GetFileSize;
-                    FtpWebResponse CheckMirrorResponse = (FtpWebResponse)CheckMirrorRequest.GetResponse();
+                    var CheckMirrorResponse = (FtpWebResponse)CheckMirrorRequest.GetResponse();
 
                     if (CheckMirrorResponse.StatusCode == FtpStatusCode.FileStatus)
                     {
@@ -83,10 +84,7 @@ namespace Updater.Utilities
                 {
                     return AvailableMirrors[RandomGenerator.Next(0, AvailableMirrors.Count)];
                 }
-                else
-                {
-                    throw new ApplicationException("No mirrors available.");
-                }
+                throw new ApplicationException("No mirrors available.");
             }
             catch(OperationCanceledException ex)
             {
@@ -108,13 +106,13 @@ namespace Updater.Utilities
         {
             try
             {
-                List<String> AvailableMirrors = new List<String>();
-                Random RandomGenerator = new Random();
+                var AvailableMirrors = new List<String>();
+                var RandomGenerator = new Random();
 
-                foreach (String HttpMirror in pHttpMirrorList)
+                foreach (var HttpMirror in pHttpMirrorList)
                 {
-                    HttpWebRequest CheckMirrorRequest = (HttpWebRequest)WebRequest.Create(HttpMirror);
-                    HttpWebResponse CheckMirrorResponse = (HttpWebResponse)CheckMirrorRequest.GetResponse();
+                    var CheckMirrorRequest = (HttpWebRequest)WebRequest.Create(HttpMirror);
+                    var CheckMirrorResponse = (HttpWebResponse)CheckMirrorRequest.GetResponse();
 
                     if (CheckMirrorResponse.StatusCode == HttpStatusCode.OK)
                     {
@@ -128,10 +126,7 @@ namespace Updater.Utilities
                 {
                     return AvailableMirrors[RandomGenerator.Next(0, AvailableMirrors.Count)];
                 }
-                else
-                {
-                    throw new ApplicationException("No mirrors available.");
-                }
+                throw new ApplicationException("No mirrors available.");
             }
             catch (OperationCanceledException ex)
             {

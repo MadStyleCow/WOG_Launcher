@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Client.Core.Utilities.Classes;
-using Client.Core.Enums;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Client.Core.Enums;
+using Client.Core.Utilities.Classes;
+using log4net;
 
 namespace Client.Core.Utilities
 {
     public static class ApplicationUpdater
     {
         /* Loggers */
-        private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(typeof(ApplicationUpdater));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ApplicationUpdater));
 
         /// <summary>
         /// Indicates whether the application requires an update.
@@ -25,17 +24,18 @@ namespace Client.Core.Utilities
             try
             {
                 // Get the app manifest
-                Task<ApplicationManifest> AppManifestTask = NetworkUtilities.DownloadToString(pRemoteManifest).ContinueWith<ApplicationManifest>(t => 
+                var appManifestTask = NetworkUtilities.DownloadToString(pRemoteManifest).ContinueWith(t => 
                     (ApplicationManifest)XMLSerializer.XmlDeserializeFromString(t.Result, typeof(ApplicationManifest)));
 
                 // Load the local manifest
-                ApplicationManifest LocalManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromFile(pLocalManifest, typeof(ApplicationManifest));
+                var localManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromFile(pLocalManifest, typeof(ApplicationManifest));
 
-                return !(await AppManifestTask).ManifestVersion.Equals(LocalManifest.ManifestVersion);
+                return (!(await appManifestTask).ManifestVersion.Equals(localManifest.ManifestVersion));
             }
-            catch(Exception)
-            {             
-                throw;
+            catch(Exception ex)
+            {
+                Logger.Error("An exception occured while trying to check the remote application manifest.", ex);
+                return false;
             }
         }
 
@@ -44,41 +44,39 @@ namespace Client.Core.Utilities
             try
             {
                 // Preload the app manifest
-                Task<ApplicationManifest> AppManifestTask = NetworkUtilities.DownloadToString(pRemoteManifest).ContinueWith<ApplicationManifest>(t =>
+                var appManifestTask = NetworkUtilities.DownloadToString(pRemoteManifest).ContinueWith(t =>
                     (ApplicationManifest)XMLSerializer.XmlDeserializeFromString(t.Result, typeof(ApplicationManifest)));
 
                 // Load the local manifest
-                ApplicationManifest LocalManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromFile(pLocalManifest, typeof(ApplicationManifest));
-                ApplicationManifest RemoteManifest = await AppManifestTask;
+                var localManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromFile(pLocalManifest, typeof(ApplicationManifest));
+                var remoteManifest = await appManifestTask;
 
-                foreach (ApplicationFile RemoteFile in RemoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.UPDATER)))
+                foreach (var remoteFile in remoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.Updater)))
                 {
-                    if (LocalManifest.ApplicationFileList.Any(p => p.ID.Equals(RemoteFile.ID)))
+                    if (localManifest.ApplicationFileList.Any(p => p.Id.Equals(remoteFile.Id)))
                     {
-                        ApplicationFile LocalFile = LocalManifest.ApplicationFileList.Find(p => p.ID.Equals(RemoteFile.ID));
+                        var localFile = localManifest.ApplicationFileList.Find(p => p.Id.Equals(remoteFile.Id));
 
-                        if (File.Exists(RemoteFile.Path))
+                        if (File.Exists(remoteFile.Path))
                         {
-                            if (!RemoteFile.Version.Equals(LocalFile.Version))
+                            if (!remoteFile.Version.Equals(localFile.Version))
                             {
-                                await FileUtilities.DeleteFile(LocalFile.Path);
-                                await NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(RemoteFile.URL).Result, RemoteFile.Path);
+                                await FileUtilities.DeleteFile(localFile.Path);
+                                await NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(remoteFile.Url).Result, remoteFile.Path);
                             }
                         }
                         else
                         {
-                            await NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(RemoteFile.URL).Result, RemoteFile.Path);
+                            await NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(remoteFile.Url).Result, remoteFile.Path);
                         }
                     }
                     else
                     {
-                        await NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(RemoteFile.URL).Result, RemoteFile.Path);
+                        await NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(remoteFile.Url).Result, remoteFile.Path);
                     }
                 }
-
-
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }

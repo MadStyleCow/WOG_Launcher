@@ -1,32 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using Client.Core.Utilities.Classes;
+using Client.Properties;
+using log4net;
 
 namespace Client.Core.Utilities
 {
     class SettingsCache
     {
+        /* Loggers */
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(SettingsCache));
+
          /* Static fields */
-        public static SettingsCache Instance = new SettingsCache(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), Properties.Settings.Default.LocalSettingsCache);
+        public static readonly SettingsCache Instance = new SettingsCache(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Settings.Default.LocalSettingsCache);
 
         /* Private fields */
-        SettingsCacheEntryList CacheEntryList;
-        String SettingsCacheLocation;
+        readonly SettingsCacheEntryList _cacheEntryList;
+        readonly String _settingsCacheLocation;
 
         /* Constructors */
-        public SettingsCache(String pBaseDirectory, String pSettingsCacheLocation)
+
+        private SettingsCache(String pBaseDirectory, String pSettingsCacheLocation)
         {
             // Set the base directory
             Directory.SetCurrentDirectory(pBaseDirectory);
 
             if (File.Exists(pSettingsCacheLocation))
             {
-                this.SettingsCacheLocation = pSettingsCacheLocation;
-                this.CacheEntryList = (SettingsCacheEntryList)XMLSerializer.XmlDeserializeFromFile(SettingsCacheLocation, typeof(SettingsCacheEntryList));
+                _settingsCacheLocation = pSettingsCacheLocation;
+                _cacheEntryList = (SettingsCacheEntryList)XMLSerializer.XmlDeserializeFromFile(_settingsCacheLocation, typeof(SettingsCacheEntryList));
             }
         }
 
@@ -35,19 +38,20 @@ namespace Client.Core.Utilities
         {
             try
             {
-                int Index = 0;
-                while (Index < CacheEntryList.SettingsCacheEntries.Count)
+                var index = 0;
+                while (index < _cacheEntryList.SettingsCacheEntries.Count)
                 {
-                    if (CacheEntryList.SettingsCacheEntries[Index].ServerIdKey.Equals(pIdKey))
+                    if (_cacheEntryList.SettingsCacheEntries[index].ServerIdKey.Equals(pIdKey))
                     {
                         return true;
                     }
-                    Index++;
+                    index++;
                 }
                 return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error("An error was encountered while trying to find an entry in the settings cache.", ex);
                 throw;
             }
         }
@@ -57,20 +61,21 @@ namespace Client.Core.Utilities
             try
             {
                 // Use while instead of foreach / extensions as those are mutable
-                int Index = 0;
-                while (Index < CacheEntryList.SettingsCacheEntries.Count)
+                var index = 0;
+                while (index < _cacheEntryList.SettingsCacheEntries.Count)
                 {
-                    if (CacheEntryList.SettingsCacheEntries[Index].ServerIdKey.Equals(pIdKey))
+                    if (_cacheEntryList.SettingsCacheEntries[index].ServerIdKey.Equals(pIdKey))
                     {
-                        return CacheEntryList.SettingsCacheEntries[Index];
+                        return _cacheEntryList.SettingsCacheEntries[index];
                     }
-                    Index++;
+                    index++;
                 }
                 throw new ApplicationException("No such id key found");
             }
             catch (Exception ex)
             {
-                throw ex;
+                Logger.Error("An error was encountered while trying to get an entry from the settings cache", ex);
+                throw;
             }
         }
 
@@ -79,20 +84,21 @@ namespace Client.Core.Utilities
             try
             {
                 // Use while instead of foreach / extensions as those are mutable
-                int Index = 0;
-                while (Index < CacheEntryList.SettingsCacheEntries.Count)
+                var index = 0;
+                while (index < _cacheEntryList.SettingsCacheEntries.Count)
                 {
-                    if (CacheEntryList.SettingsCacheEntries[Index].ServerIdKey.Equals(pIdKey))
+                    if (_cacheEntryList.SettingsCacheEntries[index].ServerIdKey.Equals(pIdKey))
                     {
-                        CacheEntryList.SettingsCacheEntries[Index] = pEntry;
+                        _cacheEntryList.SettingsCacheEntries[index] = pEntry;
                         break;
                     }
-                    Index++;
+                    index++;
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                Logger.Error("An error occured while trying to update a record in the settings cache.", ex);
+                throw;
             }
         }
         
@@ -100,10 +106,11 @@ namespace Client.Core.Utilities
         {
             try
             {
-                CacheEntryList.SettingsCacheEntries.Add(pEntry);
+                _cacheEntryList.SettingsCacheEntries.Add(pEntry);
             }
-            catch (Exception)
-            {            
+            catch (Exception ex)
+            {
+                Logger.Error("An error occured while trying to add a new record to the settings cache.", ex);
                 throw;
             }
         }
@@ -113,13 +120,15 @@ namespace Client.Core.Utilities
             try
             {
                 // Set the directory
-                Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
+// ReSharper disable once AssignNullToNotNullAttribute
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
                 // Write the file
-                File.WriteAllText(SettingsCacheLocation, CacheEntryList.XmlSerializeToString());
+                File.WriteAllText(_settingsCacheLocation, _cacheEntryList.XmlSerializeToString());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error("An error occured while trying to write the file cache to a file.", ex);
                 throw;
             }
         }

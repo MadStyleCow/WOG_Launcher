@@ -1,15 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using log4net;
 
 namespace Updater.Utilities
 {
     public static class FileUtilities
     {
         // Logger
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Calculates the MD5 hash for the indicated file.
@@ -20,7 +22,7 @@ namespace Updater.Utilities
         {
             try
             {
-                using (MD5 md5 = MD5.Create())
+                using (var md5 = MD5.Create())
                 {
                     using (var stream = File.OpenRead(pFilePath))
                     {
@@ -55,7 +57,7 @@ namespace Updater.Utilities
                     Directory.CreateDirectory(Path.GetDirectoryName(pOutput));
                 }
 
-                using (FileStream Stream = File.OpenRead(pFilePath))
+                using (var Stream = File.OpenRead(pFilePath))
                 {
                     new ZipArchive(Stream).GetEntry(pEntry).ExtractToFile(pOutput, true);
                 }
@@ -80,11 +82,11 @@ namespace Updater.Utilities
         {
             try
             {
-                FileAttributes attr = File.GetAttributes(pFilePath);
+                var attr = File.GetAttributes(pFilePath);
 
                 if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
                 {
-                    DirectoryInfo info = new DirectoryInfo(pFilePath);
+                    var info = new DirectoryInfo(pFilePath);
                     info.Attributes &= ~FileAttributes.ReadOnly;
                     info.Refresh();
                     info.Delete(true);
@@ -92,7 +94,7 @@ namespace Updater.Utilities
                 }
                 else
                 {
-                    FileInfo info = new FileInfo(pFilePath);
+                    var info = new FileInfo(pFilePath);
                     info.Attributes &= ~FileAttributes.ReadOnly;
                     info.Refresh();
                     info.Delete();

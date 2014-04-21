@@ -1,5 +1,7 @@
-﻿using Updater.Classes;
+﻿using System.Reflection;
+using Updater.Classes;
 using Updater.Enums;
+using Updater.Properties;
 using Updater.Utilities;
 using System;
 using System.Diagnostics;
@@ -16,13 +18,13 @@ namespace Updater
         /*
          * Purpose of this application is to update the main UpdateClient, when any changes to files are required.   
          */
-        private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(typeof(Program)); //log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Program)); //log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [STAThread]
         static void Main(string[] args)
         {
             // Configure the logger
-            log4net.Config.XmlConfigurator.Configure();
+            XmlConfigurator.Configure();
 
             /* Fields */
             ApplicationManifest RemoteManifest;
@@ -41,7 +43,7 @@ namespace Updater
                 Logger.Info(String.Format("Application launched. OS information {0}",Environment.OSVersion.VersionString));
 
                 // Wait for the application to shutdown.
-                while(Process.GetProcesses().Any(p => p.StartInfo.FileName.Equals(Properties.Settings.Default.UpdateClientProcessName)))
+                while(Process.GetProcesses().Any(p => p.StartInfo.FileName.Equals(Settings.Default.UpdateClientProcessName)))
                 {
                     Thread.Sleep(1000);
                     Console.WriteLine("{0} [AppUpdate] -->> Waiting for the update client to shut down...", DateTime.Now.ToString("HH:mm:ss"));
@@ -51,29 +53,29 @@ namespace Updater
                 Console.WriteLine("{0} [AppUpdate] -->> Updating application files. Please stand by...", DateTime.Now.ToString("HH:mm:ss"));
 
                 // Due to the usage of relative paths, the working directory must be set to that of the application executable
-                Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
                 // Load the local manifest
                 LocalManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromFile(
-                    Properties.Settings.Default.LocalManifest, typeof(ApplicationManifest));
+                    Settings.Default.LocalManifest, typeof(ApplicationManifest));
 
                 Logger.Info("Loaded the local manifest");
 
                 // Download the remote manifest
                 RemoteManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromString(
-                    NetworkUtilities.DownloadToString(Properties.Settings.Default.RemoteManifest).Result , typeof(ApplicationManifest));
+                    NetworkUtilities.DownloadToString(Settings.Default.RemoteManifest).Result , typeof(ApplicationManifest));
 
                 Logger.Info("Loaded the remote manifest");
 
                 // Initiate the update process.
-                foreach (ApplicationFile RemoteFile in RemoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.APPLICATION)))
+                foreach (var RemoteFile in RemoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.APPLICATION)))
                 {
                     Logger.Info(String.Format("Processing file {0}", RemoteFile));
 
                         // Check if the file is present in the local manifest
                         if (LocalManifest.ApplicationFileList.Any(p => p.ID.Equals(RemoteFile.ID)))
                         {
-                            ApplicationFile LocalFile = LocalManifest.ApplicationFileList.Find(p => p.ID.Equals(RemoteFile.ID));
+                            var LocalFile = LocalManifest.ApplicationFileList.Find(p => p.ID.Equals(RemoteFile.ID));
 
                             // There is a record of such file in a local manifest.
                             if (File.Exists(RemoteFile.Path))
@@ -116,7 +118,7 @@ namespace Updater
 
                 // Now check for the files that are present in the local manifest, but are not present in the remote manifest. 
                 // Such files have to be deleted.
-                foreach(ApplicationFile LocalFile in LocalManifest.ApplicationFileList)
+                foreach(var LocalFile in LocalManifest.ApplicationFileList)
                 {
                     if(!RemoteManifest.ApplicationFileList.Any(p => p.ID.Equals(LocalFile.ID)))
                     {

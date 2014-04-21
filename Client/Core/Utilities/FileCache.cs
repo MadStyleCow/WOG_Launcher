@@ -1,33 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
+using System.Reflection;
 using Client.Core.Utilities.Classes;
-using System.Windows;
+using Client.Properties;
+using log4net;
 
 namespace Client.Core.Utilities
 {
     class FileCache
     {
+        /* Loggers */
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(FileCache));
+
         /* Static fields */
-        public static FileCache Instance = new FileCache();
+        public static readonly FileCache Instance = new FileCache();
 
         /* Private fields */
         FileCacheEntryList CacheEntryList { get; set; }
         String FileCacheLocation { get; set; }
 
         /* Constructors */
-        public FileCache()
+        private FileCache()
         {
             // Set the base directory
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
+// ReSharper disable once AssignNullToNotNullAttribute
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
-            if (File.Exists(Properties.Settings.Default.LocalFileCache))
+            if (File.Exists(Settings.Default.LocalFileCache))
             {
-                this.FileCacheLocation = Properties.Settings.Default.LocalFileCache;
-                this.CacheEntryList = (FileCacheEntryList)XMLSerializer.XmlDeserializeFromFile(Properties.Settings.Default.LocalFileCache, typeof(FileCacheEntryList));
+                FileCacheLocation = Settings.Default.LocalFileCache;
+                CacheEntryList = (FileCacheEntryList)XMLSerializer.XmlDeserializeFromFile(Settings.Default.LocalFileCache, typeof(FileCacheEntryList));
             }
         }
 
@@ -36,20 +38,21 @@ namespace Client.Core.Utilities
         {
             try
             {
-                int Index = 0;
-                while(Index < CacheEntryList.FileCacheEntries.Count)
+                var index = 0;
+                while(index < CacheEntryList.FileCacheEntries.Count)
                 {
-                    if (CacheEntryList.FileCacheEntries[Index].Path.Equals(pPath))
+                    if (CacheEntryList.FileCacheEntries[index].Path.Equals(pPath))
                     {
                         return true;
                     }
-                    Index++;
+                    index++;
                 }
                 return false;
             }
             catch(Exception ex)
             {
-                throw ex;
+                Logger.Error("An error occured while trying to find an entry in the file cache.", ex);
+                throw;
             }
         }
 
@@ -58,20 +61,21 @@ namespace Client.Core.Utilities
             try
             {
                 // Use while instead of foreach / extensions as those are mutable
-                int Index = 0;
-                while (Index < CacheEntryList.FileCacheEntries.Count)
+                var index = 0;
+                while (index < CacheEntryList.FileCacheEntries.Count)
                 {
-                    if (CacheEntryList.FileCacheEntries[Index].Path.Equals(pPath))
+                    if (CacheEntryList.FileCacheEntries[index].Path.Equals(pPath))
                     {
-                        return CacheEntryList.FileCacheEntries[Index];
+                        return CacheEntryList.FileCacheEntries[index];
                     }
-                    Index++;
+                    index++;
                 }
                 throw new ApplicationException("No such path found");
             }
             catch(Exception ex)
             {
-                throw ex;
+                Logger.Error("An error occured while trying to get an entry from the file cache.", ex);
+                throw;
             }
         }
 
@@ -80,36 +84,56 @@ namespace Client.Core.Utilities
             try
             {
                 // Use while instead of foreach / extensions as those are mutable
-                int Index = 0;
-                while (Index < CacheEntryList.FileCacheEntries.Count)
+                var index = 0;
+                while (index < CacheEntryList.FileCacheEntries.Count)
                 {
-                    if (CacheEntryList.FileCacheEntries[Index].Path.Equals(pPath))
+                    if (CacheEntryList.FileCacheEntries[index].Path.Equals(pPath))
                     {
-                        CacheEntryList.FileCacheEntries[Index].Hash = pHash;
-                        CacheEntryList.FileCacheEntries[Index].LastWrite = pLastWrite;
+                        CacheEntryList.FileCacheEntries[index].Hash = pHash;
+                        CacheEntryList.FileCacheEntries[index].LastWrite = pLastWrite;
                         break;
                     }
-                    Index++;
+                    index++;
                 }
             }
             catch(Exception ex)
             {
-                throw ex;
+                Logger.Error("An error occured while trying to update a record in the file cache.", ex);
+                throw;
             }
         }
 
         public void Add(String pPath, String pHash, DateTime pLastWrite)
         {
-            CacheEntryList.FileCacheEntries.Add(new FileCacheEntry() { Path = pPath, Hash = pHash, LastWrite = pLastWrite });
+            try
+            {
+                CacheEntryList.FileCacheEntries.Add(new FileCacheEntry { Path = pPath, Hash = pHash, LastWrite = pLastWrite });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("An error occured while trying to add a new record to the file cache.", ex);
+                throw;
+            }
+            
         }
 
         public void Write()
         {
-            // Set the directory
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
+            try
+            {
+                // Set the directory
+// ReSharper disable once AssignNullToNotNullAttribute
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
-            // Write the file.
-            File.WriteAllText(FileCacheLocation, CacheEntryList.XmlSerializeToString());
+                // Write the file.
+                File.WriteAllText(FileCacheLocation, CacheEntryList.XmlSerializeToString());
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("An error occured while trying to write the file cache to a file.", ex);
+                throw;
+            }
+
         }
     }
 }

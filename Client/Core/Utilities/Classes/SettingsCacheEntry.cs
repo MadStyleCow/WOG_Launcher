@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Client.Core.Utilities.Classes
 {
-    [Serializable()]
+    [Serializable]
     public class SettingsCacheEntry
     {
         /* Fields */
@@ -14,7 +11,7 @@ namespace Client.Core.Utilities.Classes
         public List<String> ModList { get; set; }
         public Boolean NoSplash { get; set; }
         public Boolean ShowScriptErrors { get; set; }
-        public Boolean WinXP { get; set; }
+        public Boolean WinXp { get; set; }
         public Boolean Windowed { get; set; }
         public Boolean EmptyWorld { get; set; }
         public Boolean CpuCountChecked { get; set; }
@@ -25,18 +22,14 @@ namespace Client.Core.Utilities.Classes
         public Int32 ExThreads { get; set; }
         public String AdditionalParameters;
         public Boolean AutoConnect { get; set; }
-
-        /* Constructors */
-        public SettingsCacheEntry() { }
     }
 
-    [Serializable()]
+    [Serializable]
     public class SettingsCacheEntryList
     {
         /* Fields */
         public List<SettingsCacheEntry> SettingsCacheEntries { get; set; }
 
         /* Constructors */
-        public SettingsCacheEntryList() { }
     }
 }

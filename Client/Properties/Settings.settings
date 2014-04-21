@@ -21,7 +21,7 @@
       <Value Profile="(Default)">Resources\SettingsCache.xml</Value>
     </Setting>
     <Setting Name="RemoteAppManfest" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://www.wogames.info/appmanifest.xml</Value>
+      <Value Profile="(Default)">http://www.wogames.info/test_appmanifest.xml</Value>
     </Setting>
     <Setting Name="LocalAppManifest" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Resources\AppManifest.xml</Value>

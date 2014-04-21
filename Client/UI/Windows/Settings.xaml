@@ -28,21 +28,21 @@
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
                     <Grid Margin="0" Grid.RowSpan="5" Grid.ColumnSpan="3"/>
-                    <Button x:Name="eSteamButton" Content="Browse" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
-                    <Button x:Name="eA2Button" Content="Browse" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
-                    <Button x:Name="eA2OAButton" Content="Browse" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
-                    <Button x:Name="eA2OABetaButton" Content="Browse" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
-                    <Button x:Name="eA3Button" Content="Browse" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
-                    <Label Content="Steam" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
-                    <Label Content="ArmA 2" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
-                    <Label Content="ArmA 2 OA" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
-                    <Label Content="ArmA 2 OA Beta" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
-                    <Label Content="ArmA 3" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
-                    <TextBox x:Name="eSteam" Grid.Column="1" Grid.Row="0" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
-                    <TextBox x:Name="eArma2" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
-                    <TextBox x:Name="eArma2OA" Grid.Column="1" Grid.Row="2" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
-                    <TextBox x:Name="eArma2OABeta" Grid.Column="1" Grid.Row="3" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
-                    <TextBox x:Name="eArma3" Grid.Column="1" Grid.Row="4" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
+                    <Button Content="Browse" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
+                    <Button Content="Browse" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
+                    <Button Content="Browse" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
+                    <Button Content="Browse" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
+                    <Button Content="Browse" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
+                    <Label Grid.Row="0" Grid.Column="0" Content="Steam" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
+                    <Label Content="ArmA 2" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
+                    <Label Content="ArmA 2 OA" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
+                    <Label Content="ArmA 2 OA Beta" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
+                    <Label Content="ArmA 3" Grid.Row="4" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
+                    <TextBox x:Name="ESteam" Grid.Column="1" Grid.Row="0" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
+                    <TextBox x:Name="EArma2" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
+                    <TextBox x:Name="EArma2Oa" Grid.Column="1" Grid.Row="2" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
+                    <TextBox x:Name="EArma2OaBeta" Grid.Column="1" Grid.Row="3" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
+                    <TextBox x:Name="EArma3" Grid.Column="1" Grid.Row="4" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Mod folders">
@@ -59,18 +59,18 @@
                         <RowDefinition Height="40*"/>
                     </Grid.RowDefinitions>
                     <Label Content="ArmA 2" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
-                    <Label Content="ArmA 2 OA" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
-                    <Label Content="ArmA 3" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
-                    <TextBox x:Name="eArma2_Mod" Grid.Column="1" Grid.Row="0" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
-                    <TextBox x:Name="eArma2OA_Mod" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
-                    <TextBox x:Name="eArma3_Mod" Grid.Column="1" Grid.Row="2" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
-                    <Button x:Name="eA2ModButton" Content="Browse" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
-                    <Button x:Name="eA2OAModButton" Content="Browse" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
-                    <Button x:Name="eA3ModButton" Content="Browse" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
+                    <Label Content="ArmA 2 OA" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
+                    <Label Content="ArmA 3" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
+                    <TextBox x:Name="EArma2Mod" Grid.Column="1" Grid.Row="0" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
+                    <TextBox x:Name="EArma2OaMod" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
+                    <TextBox x:Name="EArma3Mod" Grid.Column="1" Grid.Row="2" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
+                    <Button Content="Browse" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
+                    <Button Content="Browse" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
+                    <Button Content="Browse" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button x:Name="eCancel" Content="Cancel" Grid.Column="2" HorizontalAlignment="Center" Margin="0" Grid.Row="1" VerticalAlignment="Center" Width="75" IsCancel="True" Click="eCancel_Click" />
-        <Button x:Name="eOK" Content="OK" Grid.Column="1" HorizontalAlignment="Center" Margin="0" Grid.Row="1" VerticalAlignment="Center" Width="75" IsDefault="True" Click="eOK_Click"/>
+        <Button Content="Cancel" Grid.Column="2" HorizontalAlignment="Center" Margin="0" Grid.Row="1" VerticalAlignment="Center" Width="75" IsCancel="True" Click="eCancel_Click" />
+        <Button Content="OK" Grid.Column="1" HorizontalAlignment="Center" Margin="0" Grid.Row="1" VerticalAlignment="Center" Width="75" IsDefault="True" Click="eOK_Click"/>
     </Grid>
 </Window>

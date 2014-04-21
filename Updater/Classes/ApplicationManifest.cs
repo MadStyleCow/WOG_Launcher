@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 
 namespace Updater.Classes
 {
-    [Serializable()]
+    [Serializable]
     public class ApplicationManifest
     {
         /* Fields */
         public Int32 ManifestVersion { get; set; }
         public List<ApplicationFile> ApplicationFileList { get; set; }
-
-        /* Constructors */
-        public ApplicationManifest() { }
     }
 }

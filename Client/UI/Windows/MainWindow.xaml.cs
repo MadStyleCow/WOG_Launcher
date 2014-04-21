@@ -1,29 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Client.Core.Controllers;
 using Client.Core.Enums;
 using Client.Core.Utilities.Classes;
 using Client.UI.Pages;
-using log4net;
-using log4net.Config;
 
 namespace Client.UI.Windows
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+// ReSharper disable once RedundantExtendsListEntry
     public partial class MainWindow : Window
     {
         /* Constructors */
@@ -33,15 +24,14 @@ namespace Client.UI.Windows
             InitializeComponent();
 
             // Initialize a controller
-            this.Controller = new AppController(this);
+            Controller = new AppController(this);
         }
 
         /* Fields */
         AppController Controller { get; set; }
-        AppState UIState {get; set;}
-        FrameState UIFrameState { get; set; }
-        Browser BrowserPage = new Browser();
-        Launcher LauncherPage;
+        AppState UiState {get; set;}
+        Launcher LauncherPage { get; set; }
+        readonly Browser _browserPage = new Browser();
 
         /* UI Event Handlers */
         private void eMainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -60,9 +50,9 @@ namespace Client.UI.Windows
         {
             try
             {
-                if (eServerSelect.HasItems)
+                if (EServerSelect.HasItems)
                 {
-                    Controller.ServerSelected(eServerSelect.SelectedItem.ToString());
+                    Controller.ServerSelected(EServerSelect.SelectedItem.ToString());
                 }
             }
             catch (Exception ex)
@@ -75,8 +65,8 @@ namespace Client.UI.Windows
         {
             try
             {
-                Settings SettingsWindow = new Settings() { Owner = this };
-                SettingsWindow.ShowDialog();
+                var settingsWindow = new Settings { Owner = this };
+                settingsWindow.ShowDialog();
             }
             catch (Exception ex)
             {
@@ -96,7 +86,7 @@ namespace Client.UI.Windows
             }
         }
 
-        private void eMainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void eMainWindow_Closing(object sender, CancelEventArgs e)
         {
             try
             {
@@ -113,8 +103,8 @@ namespace Client.UI.Windows
         {
             try
             {
-                this.eProgressBar.Value = pProgressValue;
-                this.eProgressLabel.Content = pProgressMessage;
+                EProgressBar.Value = pProgressValue;
+                EProgressLabel.Content = pProgressMessage;
             }
             catch (Exception ex)
             {
@@ -122,30 +112,18 @@ namespace Client.UI.Windows
             }
         }
 
-        public void SetButtonText(String pButtonText)
+        public void SetServerList(IEnumerable<string> pValues)
         {
             try
             {
-                this.eActionButton.Content = pButtonText;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
-        public void SetServerList(List<String> pValues)
-        {
-            try
-            {
-                foreach (String Value in pValues)
+                foreach (var value in pValues)
                 {
-                    eServerSelect.Items.Add(Value);
+                    EServerSelect.Items.Add(value);
                 }
 
-                if (eServerSelect.HasItems)
+                if (EServerSelect.HasItems)
                 {
-                    eServerSelect.SelectedIndex = 0;
+                    EServerSelect.SelectedIndex = 0;
                 }
             }
             catch (Exception ex)
@@ -158,7 +136,7 @@ namespace Client.UI.Windows
         {
             try
             {
-                BrowserPage.SetBrowserTarget(pUri);
+                _browserPage.SetBrowserTarget(pUri);
             }
             catch (Exception ex)
             {
@@ -166,7 +144,7 @@ namespace Client.UI.Windows
             }
         }
 
-        public void SetModFolderList(List<String> pFolderList)
+        public void SetModFolderList(IEnumerable<string> pFolderList)
         {
             try
             {
@@ -216,95 +194,83 @@ namespace Client.UI.Windows
         }
 
         /* Public methods */
-        public void SetUIState(AppState pUIState)
+        public void SetUiState(AppState pUiState)
         {
             try
             {
-                this.UIState = pUIState;
+                UiState = pUiState;
 
-                switch (UIState)
+                switch (UiState)
                 {
-                    case AppState.INIT:
-                        eSettingsButton.IsEnabled = true;
-                        eSettingsButton.Visibility = System.Windows.Visibility.Hidden;
-                        eServerSelect.IsEnabled = false;
-                        eActionButton.IsEnabled = false;
-                        eActionButton.Content = "Ponies!";
-                        eProgressBar.Value = 0;
-                        eProgressLabel.Content = "Checking the application for updates...";
+                    case AppState.Init:
+                        ESettingsButton.IsEnabled = true;
+                        ESettingsButton.Visibility = Visibility.Hidden;
+                        EServerSelect.IsEnabled = false;
+                        EActionButton.IsEnabled = false;
+                        EActionButton.Content = "Ponies!";
+                        EProgressBar.Value = 0;
+                        EProgressLabel.Content = "Checking the application for updates...";
                         break;
 
-                    case AppState.CHECK:
-                        eSettingsButton.IsEnabled = true;
-                        eSettingsButton.Visibility = System.Windows.Visibility.Visible;
-                        eServerSelect.IsEnabled = true;
-                        eActionButton.IsEnabled = true;
-                        eActionButton.Content = "Check";
-                        eProgressBar.Value = 0;
-                        eProgressLabel.Content = "Addon check is required";
-                        eMainFrame.Navigate(BrowserPage);
+                    case AppState.Check:
+                        ESettingsButton.IsEnabled = true;
+                        ESettingsButton.Visibility = Visibility.Visible;
+                        EServerSelect.IsEnabled = true;
+                        EActionButton.IsEnabled = true;
+                        EActionButton.Content = "Check";
+                        EProgressBar.Value = 0;
+                        EProgressLabel.Content = "Addon check is required";
+                        EMainFrame.Navigate(_browserPage);
                         break;
 
-                    case AppState.UPDATE:
-                        eSettingsButton.IsEnabled = true;
-                        eSettingsButton.Visibility = System.Windows.Visibility.Visible;
-                        eServerSelect.IsEnabled = true;
-                        eActionButton.IsEnabled = true;
-                        eActionButton.Content = "Update";
-                        eProgressBar.Value = 0;
-                        eProgressLabel.Content = "An update is required in order to play on this server";
+                    case AppState.Update:
+                        ESettingsButton.IsEnabled = true;
+                        ESettingsButton.Visibility = Visibility.Visible;
+                        EServerSelect.IsEnabled = true;
+                        EActionButton.IsEnabled = true;
+                        EActionButton.Content = "Update";
+                        EProgressBar.Value = 0;
+                        EProgressLabel.Content = "An update is required in order to play on this server";
                         break;
 
-                    case AppState.PLAY:
-                        eSettingsButton.IsEnabled = true;
-                        eSettingsButton.Visibility = System.Windows.Visibility.Visible;
-                        eServerSelect.IsEnabled = true;
-                        eActionButton.IsEnabled = true;
-                        eActionButton.Content = "Play";
-                        eProgressBar.Value = 0;
-                        eProgressLabel.Content = "Addon set up-to-date";
+                    case AppState.Play:
+                        ESettingsButton.IsEnabled = true;
+                        ESettingsButton.Visibility = Visibility.Visible;
+                        EServerSelect.IsEnabled = true;
+                        EActionButton.IsEnabled = true;
+                        EActionButton.Content = "Play";
+                        EProgressBar.Value = 0;
+                        EProgressLabel.Content = "Addon set up-to-date";
                         LauncherPage = new Launcher();
-                        eMainFrame.Navigate(LauncherPage);
+                        EMainFrame.Navigate(LauncherPage);
                         LauncherDisplayed();
                         break;
 
-                    case AppState.CANCELCHECK:
-                        eSettingsButton.IsEnabled = false;
-                        eSettingsButton.Visibility = System.Windows.Visibility.Hidden;
-                        eServerSelect.IsEnabled = false;
-                        eActionButton.IsEnabled = true;
-                        eProgressLabel.Content = "Preparing to check addons...";
-                        eActionButton.Content = "Cancel";
+                    case AppState.Cancelcheck:
+                        ESettingsButton.IsEnabled = false;
+                        ESettingsButton.Visibility = Visibility.Hidden;
+                        EServerSelect.IsEnabled = false;
+                        EActionButton.IsEnabled = true;
+                        EProgressLabel.Content = "Preparing to check addons...";
+                        EActionButton.Content = "Cancel";
                         break;
 
-                    case AppState.CANCELUPDATE:
-                        eSettingsButton.IsEnabled = false;
-                        eSettingsButton.Visibility = System.Windows.Visibility.Hidden;
-                        eServerSelect.IsEnabled = false;
-                        eActionButton.IsEnabled = true;
-                        eProgressLabel.Content = "Preparing to update addons...";
-                        eActionButton.Content = "Cancel";
+                    case AppState.Cancelupdate:
+                        ESettingsButton.IsEnabled = false;
+                        ESettingsButton.Visibility = Visibility.Hidden;
+                        EServerSelect.IsEnabled = false;
+                        EActionButton.IsEnabled = true;
+                        EProgressLabel.Content = "Preparing to update addons...";
+                        EActionButton.Content = "Cancel";
                         break;
 
-                    case AppState.CLOSE:
-                        eSettingsButton.IsEnabled = false;
-                        eSettingsButton.Visibility = System.Windows.Visibility.Hidden;
-                        eServerSelect.IsEnabled = false;
-                        eActionButton.IsEnabled = false;
+                    case AppState.Close:
+                        ESettingsButton.IsEnabled = false;
+                        ESettingsButton.Visibility = Visibility.Hidden;
+                        EServerSelect.IsEnabled = false;
+                        EActionButton.IsEnabled = false;
                         break;
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
-        public void SetFrameState(FrameState pFrameState)
-        {
-            try
-            {
-                this.UIFrameState = pFrameState;
             }
             catch (Exception ex)
             {

@@ -1,35 +1,38 @@
-﻿using Client.Core.Classes;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using Client.Core.Classes;
 using Client.Core.Enums;
 using Client.Core.Utilities;
 using Client.Core.Utilities.Classes;
 using Client.UI.Windows;
-using System;
-using System.Collections.Generic;
-using System.Web;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Net;
+using log4net;
+using Settings = Client.Properties.Settings;
 
 namespace Client.Core.Controllers
 {
     class AppController
     {
         /* Loggers */
-        private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(typeof(AppController));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AppController));
 
         /* Constructors */
         public AppController(MainWindow pParent)
         {
             // Save parent for future use.
-            this.Parent = pParent;
-            this.TokenSource = new CancellationTokenSource();
+            Parent = pParent;
+            TokenSource = new CancellationTokenSource();
+
+            Logger.InfoFormat("Application start-up. OS: {0} CpuCount {1}", LocalMachine.Instance.Os, LocalMachine.Instance.CpuCount);
 
             // Set current state to INIT.
-            SetAppState(AppState.INIT);
+            SetApplicationState(AppState.Init);
         }
         
         /* Fields */
@@ -40,16 +43,17 @@ namespace Client.Core.Controllers
         Server                  CurrentServer { get; set; }
 
         /* UI Access */
-        private void SetAppState(AppState pUIState)
+        private void SetApplicationState(AppState pUiState)
         {
             try
             {
-                this.ApplicationState = pUIState;
-                Parent.Dispatcher.Invoke(() => Parent.SetUIState(pUIState));
+                ApplicationState = pUiState;
+                Parent.Dispatcher.Invoke(() => Parent.SetUiState(pUiState));
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString());
+                Logger.Fatal("Failed to set application state", ex);
             }
         }
 
@@ -61,19 +65,8 @@ namespace Client.Core.Controllers
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
-            }
-        }
-
-        private void SetButtonText(String pButtonText)
-        {
-            try
-            {
-                Parent.Dispatcher.Invoke(() => Parent.SetButtonText(pButtonText));
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString());
+                Logger.Error("Failed to set progress value", ex);
             }
         }
 
@@ -85,7 +78,8 @@ namespace Client.Core.Controllers
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString());
+                Logger.Error("Failed to set browser target", ex);
             }
         }
 
@@ -93,24 +87,19 @@ namespace Client.Core.Controllers
         {
             try
             {
-                this.ServerList = pValues;
+                ServerList = pValues;
 
-                List<String> Values = new List<string>();
+                var values = pValues.Select(value => value.Name).ToList();
 
-                foreach (Server Value in pValues)
-                {
-                    Values.Add(Value.Name);
-                }
-
-                Parent.Dispatcher.Invoke(() => Parent.SetServerList(Values));
+                Parent.Dispatcher.Invoke(() => Parent.SetServerList(values));
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
-        private void SetModFolderList(List<String> pFolderList)
+        private void SetModFolderList(IEnumerable<string> pFolderList)
         {
             try
             {
@@ -118,7 +107,7 @@ namespace Client.Core.Controllers
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -130,7 +119,7 @@ namespace Client.Core.Controllers
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -142,7 +131,7 @@ namespace Client.Core.Controllers
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -153,27 +142,27 @@ namespace Client.Core.Controllers
             {
                 switch (ApplicationState)
                 {
-                    case AppState.CHECK:
+                    case AppState.Check:
                         TokenSource = new CancellationTokenSource();
                         Task.Run(() => CheckAddons(), TokenSource.Token);
                         break;
 
-                    case AppState.CANCELCHECK:
+                    case AppState.Cancelcheck:
                         TokenSource.Cancel();
-                        SetAppState(AppState.CHECK);
+                        SetApplicationState(AppState.Check);
                         break;
 
-                    case AppState.CANCELUPDATE:
+                    case AppState.Cancelupdate:
                         TokenSource.Cancel();
-                        SetAppState(AppState.UPDATE);
+                        SetApplicationState(AppState.Update);
                         break;
 
-                    case AppState.UPDATE:
+                    case AppState.Update:
                         TokenSource = new CancellationTokenSource();
                         Task.Run(() => UpdateAddons(), TokenSource.Token);
                         break;
 
-                    case AppState.PLAY:
+                    case AppState.Play:
                         GetSettingsRequest();
                         break;
 
@@ -183,7 +172,8 @@ namespace Client.Core.Controllers
             }
             catch (Exception ex)
             {
-                throw ex;
+                Logger.Error("An error was encountered while pushing a button.", ex);
+                throw;
             }
         }
 
@@ -193,24 +183,24 @@ namespace Client.Core.Controllers
             {
                 CurrentServer = ServerList.Find(p => p.Name == pSelectedServer);
 
-                if (CurrentServer.UpToDate())
+                if (CurrentServer.AddonSetValid().Result)
                 {
                     // All's well
-                    ApplicationState = AppState.PLAY;
-                    SetAppState(AppState.PLAY);
+                    ApplicationState = AppState.Play;
+                    SetApplicationState(AppState.Play);
                 }
                 else
                 {
                     // All's not well
                     // Display update frame
-                    ApplicationState = AppState.CHECK;
-                    SetAppState(AppState.CHECK);
-                    SetBrowserTarget(NetworkUtilities.GetHttpMirror(CurrentServer.ChangelogURLList).Result);
+                    ApplicationState = AppState.Check;
+                    SetApplicationState(AppState.Check);
+                    SetBrowserTarget(NetworkUtilities.GetHttpMirror(CurrentServer.ChangelogUrlList).Result);
                 }
             }
             catch(Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -219,7 +209,7 @@ namespace Client.Core.Controllers
             try
             {
                 // Set working directory to executable directory.
-                Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
                 // Save the file cache as well as the settings cache.
                 FileCache.Instance.Write();
@@ -227,8 +217,9 @@ namespace Client.Core.Controllers
 
                 Environment.Exit(0);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error("An error was encountered while trying to save the caches.", ex);
                 throw;
             }
         }
@@ -239,8 +230,9 @@ namespace Client.Core.Controllers
             {
                 Task.Run(() => LaunchGame(pEntry));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Fatal("An error was encountered while trying to launch the game.", ex);
                 throw;
             }
         }
@@ -250,13 +242,7 @@ namespace Client.Core.Controllers
             try
             {
                 // Get the mod list for this server
-                List<String> ModFolderList = new List<string>();
-
-                foreach (String DirectoryPath in Directory.EnumerateDirectories(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), "@*", SearchOption.TopDirectoryOnly))
-                {
-                    ModFolderList.Add(Path.GetFileName(DirectoryPath));
-                }
-                SetModFolderList(ModFolderList);
+                SetModFolderList(Directory.EnumerateDirectories(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), "@*", SearchOption.TopDirectoryOnly).Select(Path.GetFileName).ToList());
 
                 // Check the settings cache
                 if (SettingsCache.Instance.Contains(CurrentServer.IdKey))
@@ -265,23 +251,18 @@ namespace Client.Core.Controllers
                 }
                 else
                 {
-                    List<String> ModList = new List<string>();
-
-                    foreach (Mod ModEntry in CurrentServer.ModList)
-                    {
-                        ModList.Add(ModEntry.Name);
-                    }
+                    var modList = CurrentServer.ModList.Select(modEntry => modEntry.Name).ToList();
 
                     // Set default settings
-                    SetSettings(new SettingsCacheEntry()
+                    SetSettings(new SettingsCacheEntry
                     {
                         ServerIdKey = CurrentServer.IdKey,
-                        ModList = ModList,
+                        ModList = modList,
                         AdditionalParameters = "-nolog",
                         AutoConnect = true,
                         EmptyWorld = false,
                         NoSplash = true,
-                        WinXP = false,
+                        WinXp = false,
                         Windowed = false,
                         ShowScriptErrors = false,
                         MaxMemoryChecked = false,
@@ -293,8 +274,9 @@ namespace Client.Core.Controllers
                     });
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error("An error was encountered while trying to display the launcher", ex);
                 throw;
             }
         }
@@ -305,108 +287,115 @@ namespace Client.Core.Controllers
             try
             {
                 // Pre-load the server list.
-                Task<List<Server>> ServerListTask = GetServerList(Properties.Settings.Default.RemoteServerManifest);
+                var serverListTask = GetServerList(Settings.Default.RemoteServerManifest);
 
                 // Check for updates to the application itself.
-                if(await ApplicationUpdater.UpdatesRequired(Properties.Settings.Default.RemoteAppManfest, Properties.Settings.Default.LocalAppManifest))
+                if(await ApplicationUpdater.UpdatesRequired(Settings.Default.RemoteAppManfest, Settings.Default.LocalAppManifest))
                 {
                     // Update the application.
-                    await ApplicationUpdater.Update(Properties.Settings.Default.RemoteAppManfest, Properties.Settings.Default.LocalAppManifest);
+                    await ApplicationUpdater.Update(Settings.Default.RemoteAppManfest, Settings.Default.LocalAppManifest);
 
                     // Tell this to the user.
-                    System.Windows.MessageBox.Show("Application update required.");
+                    MessageBox.Show("Application update required.");
 
                     // Launch the updater.
-                    new Process() {StartInfo = new ProcessStartInfo() { FileName = Properties.Settings.Default.ApplicationUpdateClient}}.Start();
+                    new Process {StartInfo = new ProcessStartInfo { FileName = Settings.Default.ApplicationUpdateClient}}.Start();
 
                     // Close the application.
                     Environment.Exit(0);
                 }
                 
                 // Set the server list.
-                SetServerList(await ServerListTask);
+                SetServerList(await serverListTask);
             }
             catch (Exception ex)
             {
-                Logger.FatalFormat("Exception has occured while trying to check for application updates.{0}{1}", Environment.NewLine, ex.ToString());
-                System.Windows.MessageBox.Show("Problems with the master server =(\nPlease try again later.");
+                Logger.Fatal("Exception has occured while trying to check for application updates.", ex);
+                MessageBox.Show("Problems with the master server =(\nPlease try again later.");
             }
         }
 
         /* Private Methods */
-        private async Task<List<Server>> GetServerList(String pManifestURL)
+        private async Task<List<Server>> GetServerList(String pManifestUrl)
         {
             try
             {
                 return ((Manifest)XMLSerializer.XmlDeserializeFromString
-                    (await NetworkUtilities.DownloadToString(pManifestURL), typeof(Manifest))).ServerList;
+                    (await NetworkUtilities.DownloadToString(pManifestUrl), typeof(Manifest))).ServerList;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Fatal("An error was encountered while trying to receive the server list.", ex);
                 throw;
             }
         }
 
         private async Task CheckAddons()
         {
+            /*
+             * TODO LIST
+             * 1.) General clutter of the code. Basically - it looks ugly. Try to optimize / make better.
+             * Perhaps even rewrite some pieces of code. Especially on lower levels.
+             */
+
             try
             {
-                // Check the paths.
-                if (!LocalMachine.Instance.PathsSet(CurrentServer.Type))
+                if (LocalMachine.Instance.PathsSet(CurrentServer.Type))
                 {
-                    System.Windows.MessageBox.Show("Please set the game and mod paths for this game.\nIf the game is a steam version - please set the steam path as well.");
-                    return;
-                }
+                    SetApplicationState(AppState.Cancelcheck);
 
-                // Set app state to CANCELCHECK
-                SetAppState(AppState.CANCELCHECK);
-
-                // Receive manifests if needed.
-                if (CurrentServer.BaseManifestURL == null)
-                {
-                    CurrentServer.BaseManifestURL = await NetworkUtilities.GetFtpMirror(CurrentServer.ManifestURLList);
-                    await CurrentServer.GetAddonList(CurrentServer.BaseManifestURL);
-                }
-
-                // Go through each file and check whether it is present
-                Int32 Counter = 0;
-
-                Parallel.ForEach(CurrentServer.AddonList, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount, CancellationToken = TokenSource.Token }, file =>
-                {
-                    // Check the status of the addon
-                    file.CheckAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.ConfigExtensionList).Wait();
-
-                    // Update the counter
-                    Counter++;
-
-                    // Inform the UI
-                    if (!TokenSource.IsCancellationRequested)
+                    if (CurrentServer.BaseManifestUrl == null)
                     {
-                        this.SetProgress(Counter * (100f / CurrentServer.AddonList.Count), String.Format("Checked {0} of {1} addons.", Counter, CurrentServer.AddonList.Count));
+                        CurrentServer.BaseManifestUrl = await NetworkUtilities.GetFtpMirror(CurrentServer.ManifestUrlList);
+                        await CurrentServer.GetData(CurrentServer.BaseManifestUrl);
                     }
-                });
 
-                    this.SetProgress(100f, "Searching for files to delete...");
-
-                    CurrentServer.FileList = CurrentServer.GetFileList();
-
-                    if(!CurrentServer.UpToDate())
+                    var processedAddons = 0;
+                    Parallel.ForEach(CurrentServer.AddonList, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount, CancellationToken = TokenSource.Token }, processableAddon =>
                     {
-                        this.ApplicationState = AppState.UPDATE;
-                        SetAppState(AppState.UPDATE);
+                        processableAddon.CheckAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.ConfigExtensionList).Wait();
+                        processedAddons++;
+                        if (!TokenSource.IsCancellationRequested)
+                        {
+                            SetProgress(processedAddons * (100f / CurrentServer.AddonList.Count), 
+                                String.Format("Checked {0} of {1} addons.", processedAddons, CurrentServer.AddonList.Count));
+                        }
+                    });
 
-                        this.SetProgress(100f, String.Format("{0} files will be updated ({1} MB), {2} files will be deleted...", CurrentServer.AddonList.Count(p => !p.Status), (CurrentServer.AddonList.FindAll(p => !p.Status).Sum(p => p.Size) / 1024 / 1024), CurrentServer.FileList.Count));
+                    SetProgress(100f, "Searching for files to delete...");
+                    CurrentServer.FileList = await CurrentServer.GetFileDeleteList();
+                    if (!await CurrentServer.AddonSetValid())
+                    {
+                        SetApplicationState(AppState.Update);
+
+                        SetProgress(100f, String.Format("{0} files will be updated ({1} MB), {2} files will be deleted...", 
+                            CurrentServer.AddonList.Count(p => !p.Status), (CurrentServer.AddonList.FindAll(p => !p.Status).Sum(p => p.Size) / 1024 / 1024),
+                            CurrentServer.FileList.Count));
                     }
                     else
                     {
-                        // It's all good.
-                        this.ApplicationState = AppState.PLAY;
-                        SetAppState(AppState.PLAY);
+                        SetApplicationState(AppState.Play);
                     }
+                }
+                else
+                {
+                    MessageBox.Show("Please set the game and mod paths for this game.\nIf the game is a steam version - please set the steam path as well.");
+                }
             }
-            catch (Exception)
+            catch (ApplicationException ex)
             {
-                throw;
+                // No mirrors are currently available.
+                Logger.Error("An error occured while trying to locate a mirror.", ex);
+                SetProgress(0, "No mirrors available...");
+                MessageBox.Show("No mirrors available...");
+                SetApplicationState(AppState.Play);
+            }
+            catch (Exception ex)
+            {
+                Logger.Fatal("An error occured while checking the addon-set.", ex);
+                SetProgress(0, "An error occured while trying to check for addons.");
+                MessageBox.Show("An error occured while trying to check for addons.");
+                SetApplicationState(AppState.Check);
             }
         }
 
@@ -415,46 +404,47 @@ namespace Client.Core.Controllers
             try
             {
                 // Set UI state to CANCELUPDATE
-                SetAppState(AppState.CANCELUPDATE);
+                SetApplicationState(AppState.Cancelupdate);
 
-                Int32 Counter = 0;
-                List<Addon> AddonsToDownload = CurrentServer.AddonList.FindAll(p => !p.Status);
+                var counter = 0;
+                var addonsToDownload = CurrentServer.AddonList.FindAll(p => !p.Status);
 
-                Parallel.ForEach(AddonsToDownload, new ParallelOptions() { MaxDegreeOfParallelism = CurrentServer.ThreadCount, CancellationToken = TokenSource.Token }, file =>
+                Parallel.ForEach(addonsToDownload, new ParallelOptions { MaxDegreeOfParallelism = CurrentServer.ThreadCount, CancellationToken = TokenSource.Token }, async file =>
                 {
-                    // Download the file.
-                    file.UpdateAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type)).Wait();
+                    if (!await file.UpdateAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.BaseManifestUrl.Substring(0, CurrentServer.BaseManifestUrl.LastIndexOf("/", StringComparison.Ordinal))))
+                    {
+                        // Get a new base manifest URL
+                        CurrentServer.BaseManifestUrl = await NetworkUtilities.GetFtpMirror(CurrentServer.ManifestUrlList);
+
+                        // Repeat
+                        await file.UpdateAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.BaseManifestUrl.Substring(0, CurrentServer.BaseManifestUrl.LastIndexOf("/", StringComparison.Ordinal))); 
+                    }
+
                     // And then check it
                     file.CheckAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.ConfigExtensionList).Wait();
                     
-                    Counter++;
+                    counter++;
 
                     // Inform the UI
                     if (!TokenSource.IsCancellationRequested)
                     {
-                        this.SetProgress(Counter * (100f / AddonsToDownload.Count), String.Format("Updated {0} ({1} MB) of {2} ({3} MB) addons.", Counter, AddonsToDownload.FindAll(p => p.Status).Sum(p => p.Size) / 1024 / 1024, AddonsToDownload.Count, AddonsToDownload.Sum(p => p.Size) / 1024 / 1024));
+                        SetProgress(counter * (100f / addonsToDownload.Count), String.Format("Updated {0} ({1} MB) of {2} ({3} MB) addons.", counter, addonsToDownload.FindAll(p => p.Status).Sum(p => p.Size) / 1024 / 1024, addonsToDownload.Count, addonsToDownload.Sum(p => p.Size) / 1024 / 1024));
                     }
                 });
 
-                this.SetProgress(100f, "Deleting files...");
+                SetProgress(100f, "Deleting files...");
 
                 // File deletion
                 // Order a lot of file deletions and wait for them to complete.
-                List<Task> DeleteTasks = new List<Task>();
-                foreach (String Entry in CurrentServer.FileList)
-                {
-                    if (Directory.Exists(Entry) || File.Exists(Entry))
-                    {
-                        DeleteTasks.Add(FileUtilities.DeleteFile(Entry));
-                    }
-                }
-                await Task.WhenAll(DeleteTasks);
+                var deleteTasks = (from entry in CurrentServer.FileList where Directory.Exists(entry) || File.Exists(entry) select FileUtilities.DeleteFile(entry)).ToList();
+                await Task.WhenAll(deleteTasks);
 
                 // Re-check all of the addons (just to be sure).
                 await CheckAddons();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Fatal("An error was encountered while trying to update the addon set.", ex);
                 throw;
             }
         }
@@ -464,7 +454,7 @@ namespace Client.Core.Controllers
             try
             {
                 // Set APP state
-                SetAppState(AppState.CLOSE);
+                SetApplicationState(AppState.Close);
 
                 // Save the setting set
                 if (SettingsCache.Instance.Contains(CurrentServer.IdKey))
@@ -477,18 +467,18 @@ namespace Client.Core.Controllers
                     SettingsCache.Instance.Add(pEntry);
                 }
 
-                if (GameLauncher.LaunchGame(this.CurrentServer, pEntry))
+                if (GameLauncher.LaunchGame(CurrentServer, pEntry))
                 {
                     Shutdown();
                 }
                 else
                 {
-                    System.Windows.MessageBox.Show("Unable to launch the game :(");
+                    MessageBox.Show("Unable to launch the game :(");
                 }
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
     }

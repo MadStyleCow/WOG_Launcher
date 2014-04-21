@@ -48,7 +48,7 @@ namespace Client.Core.Utilities
             var serializer = new XmlSerializer(pType);
             object result;
 
-            using (StreamReader reader = new StreamReader(pFile))
+            using (var reader = new StreamReader(pFile))
             {
                 result = serializer.Deserialize(reader);
             }

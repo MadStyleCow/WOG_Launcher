@@ -1,28 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Forms.Integration;
+using WebBrowser = System.Windows.Forms.WebBrowser;
 
 namespace Client.UI.Pages
 {
     /// <summary>
     /// Interaction logic for Browser.xaml
     /// </summary>
-    public partial class Browser : Page
+    public partial class Browser
     {
         /* Fields */
-        System.Windows.Forms.Integration.WindowsFormsHost eHost;
-        System.Windows.Forms.WebBrowser eBrowser;
+        readonly WebBrowser _eBrowser;
 
         /* Constructors */
         public Browser()
@@ -31,19 +19,21 @@ namespace Client.UI.Pages
             InitializeComponent();
 
             // Initialize the WinForm host
-            this.eHost = new System.Windows.Forms.Integration.WindowsFormsHost();
-            this.eBrowser = new System.Windows.Forms.WebBrowser();
-            this.eBrowser.ScrollBarsEnabled = false;
-            this.eBrowser.Width = Convert.ToInt32(this.eBrowserPage.RenderSize.Width);
-            this.eBrowser.Height = Convert.ToInt32(this.eBrowserPage.RenderSize.Height);
-            this.eHost.Child = eBrowser;
-            this.eBrowserGrid.Children.Add(this.eHost);
+            var eHost = new WindowsFormsHost();
+            _eBrowser = new WebBrowser
+            {
+                ScrollBarsEnabled = false,
+                Width = Convert.ToInt32(EBrowserPage.RenderSize.Width),
+                Height = Convert.ToInt32(EBrowserPage.RenderSize.Height)
+            };
+            eHost.Child = _eBrowser;
+            EBrowserGrid.Children.Add(eHost);
         }
 
         /* UI Access */
         public void SetBrowserTarget(String pUri)
         {
-            eBrowser.Navigate(pUri);
+            _eBrowser.Navigate(pUri);
         }
     }
 }
