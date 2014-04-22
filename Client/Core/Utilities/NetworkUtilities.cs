@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using Client.Properties;
+using log4net;
 
 namespace Client.Core.Utilities
 {
     public static class NetworkUtilities
     {
+        // Logger
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         /// <summary>
         /// Downloads a file from a remote host and downloads it to a local location.
         /// </summary>
@@ -20,12 +25,18 @@ namespace Client.Core.Utilities
             {
                 try
                 {
-                    await new WebClient().DownloadFileTaskAsync(pInputUrl, pOutputPath);
+                    //await new WebClient().DownloadFileTaskAsync(pInputUrl, pOutputPath);
+                    new WebClient().DownloadFile(pInputUrl, pOutputPath);
                     return true;
                 }
-                catch(WebException)
+                catch (WebException ex)
                 {
                     // File not accessable or timed out while trying to download. In any case - do nothing.
+                    Logger.Error("An error was encountered while trying to download a file.", ex);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("An error was encountered while trying to download a file.", ex);
                 }
             }
             return false;
@@ -57,9 +68,10 @@ namespace Client.Core.Utilities
                 {
                     try
                     {
-                        var checkMirrorRequest = (FtpWebRequest)WebRequest.Create(ftpMirror);
+                        var checkMirrorRequest = (FtpWebRequest) WebRequest.Create(ftpMirror);
                         checkMirrorRequest.Method = WebRequestMethods.Ftp.GetFileSize;
-                        var checkMirrorResponse = (FtpWebResponse)checkMirrorRequest.GetResponse();
+                        checkMirrorRequest.Timeout = 90000;
+                        var checkMirrorResponse = (FtpWebResponse) checkMirrorRequest.GetResponse();
 
                         if (checkMirrorResponse.StatusCode == FtpStatusCode.FileStatus)
                         {
@@ -68,7 +80,10 @@ namespace Client.Core.Utilities
 
                         checkMirrorResponse.Close();
                     }
-                    catch (WebException) { }
+                    catch (WebException ex)
+                    {
+                        Logger.Error("An error was encountered while awaiting for a response from an FTP mirror.", ex);
+                    }
                 }
 
                 if (availableMirrors.Count > 0)
@@ -79,6 +94,7 @@ namespace Client.Core.Utilities
             }
             catch(Exception ex)
             {
+                Logger.Error("An error was encountered while trying to find an FTP mirror.", ex);
                 throw;
             }
         }
@@ -117,6 +133,7 @@ namespace Client.Core.Utilities
             }
             catch (Exception ex)
             {
+                Logger.Error("An error was encountered while trying to find an HTTP mirror.", ex);
                 throw;
             }
         }

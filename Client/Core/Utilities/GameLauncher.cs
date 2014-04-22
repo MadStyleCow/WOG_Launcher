@@ -20,8 +20,8 @@ namespace Client.Core.Utilities
         {
             try
             {
-                var game = new Process();
-                var argumentString = GenerateParameterString(pServer, pSettings);
+                Process game = new Process();
+                String argumentString = GenerateParameterString(pServer, pSettings);
 
                 switch (pServer.Type)
                 {
@@ -132,7 +132,7 @@ namespace Client.Core.Utilities
         {
             try
             {
-                var parameterString = new StringBuilder();
+                StringBuilder parameterString = new StringBuilder();
 
                 switch (pServer.Type)
                 {
@@ -175,12 +175,12 @@ namespace Client.Core.Utilities
                     #region ARMA2OABeta
                     case GameType.Arma2Oabeta:
                         if (LocalMachine.Instance.SteamVersion(GameType.Arma2Oa))
-                            parameterString.Append("-applaunch 219540 ");
+                            parameterString.Append("-applaunch 219540");
 
                         // Add mods
                         if (pSettings.ModList.Count != 0)
                         {
-                            parameterString.AppendFormat("\"-beta={0};{1};\" ", LocalMachine.Instance.GetBaseDirectory(GameType.Arma2Oabeta), Path.Combine(LocalMachine.Instance.GetBaseDirectory(GameType.Arma2Oabeta), "expansion"));
+                            parameterString.AppendFormat(" \"-beta={0};{1};\" ", LocalMachine.Instance.GetBaseDirectory(GameType.Arma2Oabeta), Path.Combine(LocalMachine.Instance.GetBaseDirectory(GameType.Arma2Oabeta), "expansion"));
 
                             if (LocalMachine.Instance.SteamVersion(GameType.Arma2Oa))
                             {

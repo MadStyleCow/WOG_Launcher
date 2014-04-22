@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Forms.Integration;
 using WebBrowser = System.Windows.Forms.WebBrowser;
 
@@ -23,8 +24,6 @@ namespace Client.UI.Pages
             _eBrowser = new WebBrowser
             {
                 ScrollBarsEnabled = false,
-                Width = Convert.ToInt32(EBrowserPage.RenderSize.Width),
-                Height = Convert.ToInt32(EBrowserPage.RenderSize.Height)
             };
             eHost.Child = _eBrowser;
             EBrowserGrid.Children.Add(eHost);
@@ -33,7 +32,8 @@ namespace Client.UI.Pages
         /* UI Access */
         public void SetBrowserTarget(String pUri)
         {
-            _eBrowser.Navigate(pUri);
+            Task.Run(() => _eBrowser.Navigate(pUri));
+            //_eBrowser.Navigate(pUri);
         }
     }
 }

@@ -23,7 +23,6 @@ namespace Client.Core.Utilities
         private FileCache()
         {
             // Set the base directory
-// ReSharper disable once AssignNullToNotNullAttribute
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
             if (File.Exists(Settings.Default.LocalFileCache))

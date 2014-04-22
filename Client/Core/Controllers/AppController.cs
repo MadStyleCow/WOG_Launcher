@@ -143,7 +143,7 @@ namespace Client.Core.Controllers
                 // Check the paths.
                 if (!LocalMachine.Instance.PathsSet(CurrentServer.Type))
                 {
-                    System.Windows.MessageBox.Show("Please set the game and mod paths for this game.\nIf the game is a steam version - please set the steam path as well.");
+                    MessageBox.Show("Please set the game and mod paths for this game.\nIf the game is a steam version - please set the steam path as well.");
                     return;
                 }
 
@@ -351,22 +351,30 @@ namespace Client.Core.Controllers
                     // Receive manifests if needed.
                     if (CurrentServer.BaseManifestUrl == null)
                     {
-                        CurrentServer.BaseManifestUrl = await NetworkUtilities.GetHttpMirror(CurrentServer.ManifestUrlList);
+                        CurrentServer.BaseManifestUrl =
+                            await NetworkUtilities.GetFtpMirror(CurrentServer.ManifestUrlList);
                         await CurrentServer.GetData(CurrentServer.BaseManifestUrl);
                     }
 
-                // Go through each file and check whether it is present
+                    // Go through each file and check whether it is present
                     var processedAddons = 0;
-                    Parallel.ForEach(CurrentServer.AddonList, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount, CancellationToken = TokenSource.Token }, processableAddon =>
-                    {
-                        processableAddon.CheckAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.ConfigExtensionList).Wait();
-                        processedAddons++;
-                        if (!TokenSource.IsCancellationRequested)
+                    Parallel.ForEach(CurrentServer.AddonList,
+                        new ParallelOptions
                         {
-                            SetProgress(processedAddons * (100f / CurrentServer.AddonList.Count), 
-                                String.Format("Checked {0} of {1} addons.", processedAddons, CurrentServer.AddonList.Count));
-                        }
-                    });
+                            MaxDegreeOfParallelism = Environment.ProcessorCount,
+                            CancellationToken = TokenSource.Token
+                        }, processableAddon =>
+                        {
+                            processableAddon.CheckAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type),
+                                CurrentServer.ConfigExtensionList).Wait();
+                            processedAddons++;
+                            if (!TokenSource.IsCancellationRequested)
+                            {
+                                SetProgress(processedAddons*(100f/CurrentServer.AddonList.Count),
+                                    String.Format("Checked {0} of {1} addons.", processedAddons,
+                                        CurrentServer.AddonList.Count));
+                            }
+                        });
 
                     SetProgress(100f, "Searching for files to delete...");
                     CurrentServer.FileList = await CurrentServer.GetFileDeleteList();
@@ -374,9 +382,11 @@ namespace Client.Core.Controllers
                     {
                         SetApplicationState(AppState.Update);
 
-                        SetProgress(100f, String.Format("{0} files will be updated ({1} MB), {2} files will be deleted...", 
-                            CurrentServer.AddonList.Count(p => !p.Status), (CurrentServer.AddonList.FindAll(p => !p.Status).Sum(p => p.Size) / 1024 / 1024),
-                            CurrentServer.FileList.Count));
+                        SetProgress(100f,
+                            String.Format("{0} files will be updated ({1} MB), {2} files will be deleted...",
+                                CurrentServer.AddonList.Count(p => !p.Status),
+                                (CurrentServer.AddonList.FindAll(p => !p.Status).Sum(p => p.Size)/1024/1024),
+                                CurrentServer.FileList.Count));
                     }
                     else
                     {
@@ -385,8 +395,13 @@ namespace Client.Core.Controllers
                 }
                 else
                 {
-                    MessageBox.Show("Please set the game and mod paths for this game.\nIf the game is a steam version - please set the steam path as well.");
+                    MessageBox.Show(
+                        "Please set the game and mod paths for this game.\nIf the game is a steam version - please set the steam path as well.");
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                // Do nothing
             }
             catch (ApplicationException ex)
             {
@@ -415,15 +430,18 @@ namespace Client.Core.Controllers
                 var counter = 0;
                 var addonsToDownload = CurrentServer.AddonList.FindAll(p => !p.Status);
 
-                Parallel.ForEach(addonsToDownload, new ParallelOptions { MaxDegreeOfParallelism = CurrentServer.ThreadCount, CancellationToken = TokenSource.Token }, async file =>
+                Boolean mirrorSwitchInProgress = false;
+                Parallel.ForEach(addonsToDownload, new ParallelOptions { MaxDegreeOfParallelism = CurrentServer.ThreadCount, CancellationToken = TokenSource.Token }, file =>
                 {
-                    if (!await file.UpdateAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.BaseManifestUrl.Substring(0, CurrentServer.BaseManifestUrl.LastIndexOf("/", StringComparison.Ordinal))))
+                    if (!file.UpdateAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.BaseManifestUrl.Substring(0, CurrentServer.BaseManifestUrl.LastIndexOf("/", StringComparison.Ordinal))).Result)
                     {
+
                         // Get a new base manifest URL
-                        CurrentServer.BaseManifestUrl = await NetworkUtilities.GetFtpMirror(CurrentServer.ManifestUrlList);
+                        String newBaseManifestUrl = NetworkUtilities.GetFtpMirror(CurrentServer.ManifestUrlList).Result;
+                        CurrentServer.BaseManifestUrl = newBaseManifestUrl;
 
                         // Repeat
-                        await file.UpdateAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.BaseManifestUrl.Substring(0, CurrentServer.BaseManifestUrl.LastIndexOf("/", StringComparison.Ordinal))); 
+                        file.UpdateAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.BaseManifestUrl.Substring(0, CurrentServer.BaseManifestUrl.LastIndexOf("/", StringComparison.Ordinal))).Wait(); 
                     }
 
                     // And then check it
@@ -448,8 +466,14 @@ namespace Client.Core.Controllers
                 // Re-check all of the addons (just to be sure).
                 await CheckAddons();
             }
+            catch (OperationCanceledException)
+            {
+                // Do nothing
+            }
             catch (Exception ex)
             {
+                MessageBox.Show(ex.ToString());
+                SetApplicationState(AppState.Update);
                 Logger.Fatal("An error was encountered while trying to update the addon set.", ex);
                 throw;
             }

@@ -34,18 +34,18 @@ namespace Client.UI.Windows
                         break;
 
                     case "eA2Button":
-                        this.EArma2.Text = dialog.FileName;
+                        EArma2.Text = dialog.FileName;
                         if (EArma2Mod.Text.Equals(String.Empty))
                         {
-                            this.EArma2Mod.Text = Path.GetDirectoryName(dialog.FileName);
+                            EArma2Mod.Text = Path.GetDirectoryName(dialog.FileName);
                         }
                         break;
 
                     case "eA2OAButton":
-                        this.EArma2Oa.Text = dialog.FileName;
+                        EArma2Oa.Text = dialog.FileName;
                         if (EArma2OaMod.Text.Equals(String.Empty))
                         {
-                            this.EArma2OaMod.Text = Path.GetDirectoryName(dialog.FileName);
+                            EArma2OaMod.Text = Path.GetDirectoryName(dialog.FileName);
                         }
                         break;
 
@@ -54,10 +54,10 @@ namespace Client.UI.Windows
                         break;
 
                     case "eA3Button":
-                        this.EArma3.Text = dialog.FileName;
+                        EArma3.Text = dialog.FileName;
                         if (EArma3Mod.Text.Equals(String.Empty))
                         {
-                            this.EArma3Mod.Text = Path.GetDirectoryName(dialog.FileName);
+                            EArma3Mod.Text = Path.GetDirectoryName(dialog.FileName);
                         }
                         break;
 

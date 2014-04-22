@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows;
 using Client.Core.Utilities;
 
 namespace Client.Core.Classes
@@ -86,6 +87,7 @@ namespace Client.Core.Classes
             }
             catch(Exception ex)
             {
+                MessageBox.Show(ex.ToString());
                 throw;
             }
             finally
