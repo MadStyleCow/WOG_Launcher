@@ -62,17 +62,17 @@ namespace Client.Core.Utilities
                             if (!remoteFile.Version.Equals(localFile.Version))
                             {
                                 await FileUtilities.DeleteFile(localFile.Path);
-                                await NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(remoteFile.Url).Result, remoteFile.Path);
+                                await NetworkUtilities.DownloadToFile(NetworkUtilities.GetMirror(remoteFile.Url).Result, remoteFile.Path);
                             }
                         }
                         else
                         {
-                            await NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(remoteFile.Url).Result, remoteFile.Path);
+                            await NetworkUtilities.DownloadToFile(NetworkUtilities.GetMirror(remoteFile.Url).Result, remoteFile.Path);
                         }
                     }
                     else
                     {
-                        await NetworkUtilities.DownloadToFile(NetworkUtilities.GetFtpMirror(remoteFile.Url).Result, remoteFile.Path);
+                        await NetworkUtilities.DownloadToFile(NetworkUtilities.GetMirror(remoteFile.Url).Result, remoteFile.Path);
                     }
                 }
             }

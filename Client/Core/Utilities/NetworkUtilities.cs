@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Windows;
 using Client.Properties;
 using log4net;
 
@@ -52,37 +55,44 @@ namespace Client.Core.Utilities
             return await new WebClient().DownloadStringTaskAsync(pInputUrl);
         }
 
-        /// <summary>
-        /// Tests the list of mirrors for working ones.
-        /// </summary>
-        /// <param name="pFtpMirrorList">List of mirrors to be tested.</param>
-        /// <returns>A randomly selected, working mirror.</returns>
-        public static async Task<String> GetFtpMirror(IEnumerable<string> pFtpMirrorList)
+        public static async Task<String> GetMirror(IEnumerable<String> pMirrorList)
         {
             try
             {
                 var availableMirrors = new List<String>();
                 var randomGenerator = new Random();
 
-                foreach (var ftpMirror in pFtpMirrorList)
+                foreach (var mirror in pMirrorList)
                 {
                     try
                     {
-                        var checkMirrorRequest = (FtpWebRequest) WebRequest.Create(ftpMirror);
-                        checkMirrorRequest.Method = WebRequestMethods.Ftp.GetFileSize;
-                        checkMirrorRequest.Timeout = 90000;
-                        var checkMirrorResponse = (FtpWebResponse) checkMirrorRequest.GetResponse();
-
-                        if (checkMirrorResponse.StatusCode == FtpStatusCode.FileStatus)
+                        var mirrorUri = new Uri(mirror);
+                        if (mirrorUri.Scheme.Equals("ftp"))
                         {
-                            availableMirrors.Add(ftpMirror);
+                            if (GetFtpMirror(mirrorUri).Result)
+                            {
+                                availableMirrors.Add(mirrorUri.ToString());
+                            }
+                            else
+                            {
+                                MessageBox.Show("z");
+                            }
                         }
-
-                        checkMirrorResponse.Close();
+                        else if (mirrorUri.Scheme.Equals("http"))
+                        {
+                            if (GetHttpMirror(mirrorUri).Result)
+                            {
+                                availableMirrors.Add(mirrorUri.ToString());
+                            }
+                        }
+                        else
+                        {
+                            throw new ApplicationException("Unknown URI schema");
+                        }
                     }
                     catch (WebException ex)
                     {
-                        Logger.Error("An error was encountered while awaiting for a response from an FTP mirror.", ex);
+                        Logger.Error("An error was encountered while awaiting for a response from a mirror.", ex);
                     }
                 }
 
@@ -92,49 +102,59 @@ namespace Client.Core.Utilities
                 }
                 throw new ApplicationException("No mirrors available");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Logger.Error("An error was encountered while trying to find an FTP mirror.", ex);
+                Logger.Error("An error was encountered while trying to find a mirror.", ex);
                 throw;
             }
         }
 
-
-        /// <summary>
-        /// Tests the list of mirrors for working ones.
-        /// </summary>
-        /// <param name="pHttpMirrorList">List of mirrors to be tested.</param>
-        /// <returns>A randomly selected, working mirror.</returns>
-        public static async Task<String> GetHttpMirror(IEnumerable<string> pHttpMirrorList)
+        private static async Task<Boolean> GetFtpMirror(Uri pFtpMirror)
         {
+            FtpWebResponse checkMirrorResponse = null;
             try
             {
-                var availableMirrors = new List<String>();
-                var randomGenerator = new Random();
+                var checkMirrorRequest = (FtpWebRequest) WebRequest.Create(pFtpMirror);
+                checkMirrorRequest.Method = WebRequestMethods.Ftp.GetFileSize;
+                checkMirrorRequest.Timeout = 45000;
+                checkMirrorRequest.UseBinary = true;
+                checkMirrorResponse = (FtpWebResponse) checkMirrorRequest.GetResponse();
 
-                foreach (var httpMirror in pHttpMirrorList)
+                return (checkMirrorResponse.StatusCode == FtpStatusCode.FileStatus);
+            }
+            catch (WebException ex)
+            {
+                Logger.Error("An error was encountered while awaiting for a response from an FTP mirror.", ex);
+                return false;
+            }
+            finally
+            {
+                if (checkMirrorResponse != null)
                 {
-                    var checkMirrorRequest = (HttpWebRequest)WebRequest.Create(httpMirror);
-                    var checkMirrorResponse = (HttpWebResponse)checkMirrorRequest.GetResponse();
-
-                    if (checkMirrorResponse.StatusCode == HttpStatusCode.OK)
-                    {
-                        availableMirrors.Add(httpMirror);
-                    }
-
                     checkMirrorResponse.Close();
                 }
+            }
+        }
 
-                if (availableMirrors.Count > 0)
-                {
-                    return availableMirrors[randomGenerator.Next(0, availableMirrors.Count)];
-                }
-                throw new ApplicationException("No mirrors available.");
+        private static async Task<Boolean> GetHttpMirror(Uri pFtpMirror)
+        {
+            HttpWebResponse checkMirrorResponse = null;
+            try
+            {
+                var checkMirrorRequest = (HttpWebRequest) WebRequest.Create(pFtpMirror);
+                checkMirrorResponse = (HttpWebResponse) checkMirrorRequest.GetResponse();
+
+                return (checkMirrorResponse.StatusCode == HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                Logger.Error("An error was encountered while trying to find an HTTP mirror.", ex);
-                throw;
+                Logger.Error("An error was encountered while awaiting for a response from an HTTP mirror.", ex);
+                return false;
+            }
+            finally
+            {
+                if (checkMirrorResponse != null)
+                    checkMirrorResponse.Close();
             }
         }
     }
