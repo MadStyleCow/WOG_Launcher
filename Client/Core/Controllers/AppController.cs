@@ -200,7 +200,7 @@ namespace Client.Core.Controllers
                     // All's not well
                     // Display update frame
                     SetApplicationState(AppState.Check);
-                    SetBrowserTarget(NetworkUtilities.GetHttpMirror(CurrentServer.ChangelogUrlList).Result);
+                    SetBrowserTarget(NetworkUtilities.GetMirror(CurrentServer.ChangelogUrlList).Result);
                 }
             }
             catch(Exception ex)
@@ -352,7 +352,7 @@ namespace Client.Core.Controllers
                     if (CurrentServer.BaseManifestUrl == null)
                     {
                         CurrentServer.BaseManifestUrl =
-                            await NetworkUtilities.GetFtpMirror(CurrentServer.ManifestUrlList);
+                            await NetworkUtilities.GetMirror(CurrentServer.ManifestUrlList);
                         await CurrentServer.GetData(CurrentServer.BaseManifestUrl);
                     }
 
@@ -430,14 +430,13 @@ namespace Client.Core.Controllers
                 var counter = 0;
                 var addonsToDownload = CurrentServer.AddonList.FindAll(p => !p.Status);
 
-                Boolean mirrorSwitchInProgress = false;
                 Parallel.ForEach(addonsToDownload, new ParallelOptions { MaxDegreeOfParallelism = CurrentServer.ThreadCount, CancellationToken = TokenSource.Token }, file =>
                 {
                     if (!file.UpdateAddon(LocalMachine.Instance.GetModDirectory(CurrentServer.Type), CurrentServer.BaseManifestUrl.Substring(0, CurrentServer.BaseManifestUrl.LastIndexOf("/", StringComparison.Ordinal))).Result)
                     {
 
                         // Get a new base manifest URL
-                        String newBaseManifestUrl = NetworkUtilities.GetFtpMirror(CurrentServer.ManifestUrlList).Result;
+                        String newBaseManifestUrl = NetworkUtilities.GetMirror(CurrentServer.ManifestUrlList).Result;
                         CurrentServer.BaseManifestUrl = newBaseManifestUrl;
 
                         // Repeat

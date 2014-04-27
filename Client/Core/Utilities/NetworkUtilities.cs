@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Compression;
-using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -72,10 +70,6 @@ namespace Client.Core.Utilities
                             if (GetFtpMirror(mirrorUri).Result)
                             {
                                 availableMirrors.Add(mirrorUri.ToString());
-                            }
-                            else
-                            {
-                                MessageBox.Show("z");
                             }
                         }
                         else if (mirrorUri.Scheme.Equals("http"))

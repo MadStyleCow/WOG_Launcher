@@ -24,11 +24,11 @@ namespace Updater.Utilities
                 }
                 catch(OperationCanceledException ex)
                 {
-                    throw ex;
+                    throw;
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    throw;
                 }
             }
         }
@@ -44,13 +44,13 @@ namespace Updater.Utilities
             {
                 return await new WebClient().DownloadStringTaskAsync(pInputUrl);
             }
-            catch(OperationCanceledException ex)
+            catch(OperationCanceledException)
             {
-                throw ex;
+                throw;
             }
-            catch(Exception ex)
+            catch(Exception)
             {
-                throw ex;
+                throw;
             }
         }
 

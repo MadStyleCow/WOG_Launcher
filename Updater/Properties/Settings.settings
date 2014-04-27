@@ -1,18 +1,18 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ApplicationUpdate.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Updater.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="RemoteManifest" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ftp://arma2.wogames.info/appmanifest.xml</Value>
+      <Value Profile="(Default)">ftp://arma2.wogames.info/test_appmanifest.xml</Value>
     </Setting>
     <Setting Name="LocalManifest" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Resources\AppManifest.xml</Value>
+      <Value Profile="(Default)">..\Resources\AppManifest.xml</Value>
     </Setting>
     <Setting Name="UpdateClientExecutablePath" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Client.exe</Value>
+      <Value Profile="(Default)">..\Client\Client.exe</Value>
     </Setting>
     <Setting Name="RetryAttempts" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">3</Value>
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="UpdateClientProcessName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Client.exe</Value>

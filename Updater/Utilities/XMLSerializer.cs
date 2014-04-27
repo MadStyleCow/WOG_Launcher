@@ -2,11 +2,15 @@
 using System.IO;
 using System.Text;
 using System.Xml.Serialization;
+using log4net;
 
 namespace Updater.Utilities
 {
     public static class XMLSerializer
     {
+        /* Loggers */
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(XMLSerializer));
+
         public static string XmlSerializeToString(this object pObjectInstance)
         {
             try
@@ -21,8 +25,9 @@ namespace Updater.Utilities
 
                 return sb.ToString();
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Logger.Fatal("An error was encountered while trying to serialize.", ex);
                 throw;
             }
         }
@@ -33,8 +38,9 @@ namespace Updater.Utilities
             {
                 return (T)XmlDeserializeFromString(pObjectData, typeof(T));
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Logger.Fatal("An error was encountered while trying to deserialize from string.", ex);
                 throw;
             }
         }
@@ -53,8 +59,9 @@ namespace Updater.Utilities
 
                 return result;
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Logger.Fatal("An error was encountered while trying to deserialize from string.", ex);
                 throw;
             }
         }
@@ -78,8 +85,9 @@ namespace Updater.Utilities
 
                 return result;
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Logger.Fatal("An error was encountered while trying to deserialize from file.", ex);
                 throw;
             }
         }
@@ -98,8 +106,9 @@ namespace Updater.Utilities
 
                 return result;
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Logger.Fatal("An error was encountered while trying to deserialize from stream.", ex);
                 throw;
             }
         }

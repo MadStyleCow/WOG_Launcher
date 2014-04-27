@@ -30,14 +30,14 @@ namespace Updater.Utilities
                     }
                 }
             }
-            catch(OperationCanceledException ex)
+            catch(OperationCanceledException)
             {
-                throw ex;
+                throw;
             }
             catch(Exception ex)
             {
                 log.Error(String.Format("Exception caught while trying to calculate hashsum for file '{0}'", pFilePath), ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -90,7 +90,6 @@ namespace Updater.Utilities
                     info.Attributes &= ~FileAttributes.ReadOnly;
                     info.Refresh();
                     info.Delete(true);
-                    return;
                 }
                 else
                 {
@@ -98,7 +97,6 @@ namespace Updater.Utilities
                     info.Attributes &= ~FileAttributes.ReadOnly;
                     info.Refresh();
                     info.Delete();
-                    return;
                 }
             }
             catch(OperationCanceledException ex)

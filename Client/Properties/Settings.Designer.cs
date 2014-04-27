@@ -34,7 +34,7 @@ namespace Client.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Resources\\FileCache.xml")]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\Resources\\FileCache.xml")]
         public string LocalFileCache {
             get {
                 return ((string)(this["LocalFileCache"]));
@@ -76,7 +76,7 @@ namespace Client.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Resources\\SettingsCache.xml")]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\Resources\\SettingsCache.xml")]
         public string LocalSettingsCache {
             get {
                 return ((string)(this["LocalSettingsCache"]));
@@ -94,7 +94,7 @@ namespace Client.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Resources\\AppManifest.xml")]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\Resources\\AppManifest.xml")]
         public string LocalAppManifest {
             get {
                 return ((string)(this["LocalAppManifest"]));
@@ -163,7 +163,7 @@ namespace Client.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ApplicationUpdate.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\Updater\\Updater.exe")]
         public string ApplicationUpdateClient {
             get {
                 return ((string)(this["ApplicationUpdateClient"]));

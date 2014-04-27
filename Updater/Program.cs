@@ -26,10 +26,6 @@ namespace Updater
             // Configure the logger
             XmlConfigurator.Configure();
 
-            /* Fields */
-            ApplicationManifest RemoteManifest;
-            ApplicationManifest LocalManifest;
-
             try
             {
                 /* 
@@ -56,13 +52,13 @@ namespace Updater
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
                 // Load the local manifest
-                LocalManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromFile(
+                ApplicationManifest LocalManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromFile(
                     Settings.Default.LocalManifest, typeof(ApplicationManifest));
 
                 Logger.Info("Loaded the local manifest");
 
                 // Download the remote manifest
-                RemoteManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromString(
+                ApplicationManifest RemoteManifest = (ApplicationManifest)XMLSerializer.XmlDeserializeFromString(
                     NetworkUtilities.DownloadToString(Settings.Default.RemoteManifest).Result , typeof(ApplicationManifest));
 
                 Logger.Info("Loaded the remote manifest");

@@ -78,6 +78,7 @@ namespace Client.Core.Utilities
             }
             catch (Exception ex)
             {
+                Logger.Error("An error was encountered while trying to update the application.", ex);
                 throw;
             }
         }
