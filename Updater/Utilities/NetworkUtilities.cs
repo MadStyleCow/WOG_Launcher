@@ -63,26 +63,26 @@ namespace Updater.Utilities
         {
             try
             {
-                var AvailableMirrors = new List<String>();
-                var RandomGenerator = new Random();
+                var availableMirrors = new List<String>();
+                var randomGenerator = new Random();
 
-                foreach (var FtpMirror in pFtpMirrorList)
+                foreach (var ftpMirror in pFtpMirrorList)
                 {
-                    var CheckMirrorRequest = (FtpWebRequest)WebRequest.Create(FtpMirror);
-                    CheckMirrorRequest.Method = WebRequestMethods.Ftp.GetFileSize;
-                    var CheckMirrorResponse = (FtpWebResponse)CheckMirrorRequest.GetResponse();
+                    var checkMirrorRequest = (FtpWebRequest)WebRequest.Create(ftpMirror);
+                    checkMirrorRequest.Method = WebRequestMethods.Ftp.GetFileSize;
+                    var checkMirrorResponse = (FtpWebResponse)checkMirrorRequest.GetResponse();
 
-                    if (CheckMirrorResponse.StatusCode == FtpStatusCode.FileStatus)
+                    if (checkMirrorResponse.StatusCode == FtpStatusCode.FileStatus)
                     {
-                        AvailableMirrors.Add(FtpMirror);
+                        availableMirrors.Add(ftpMirror);
                     }
 
-                    CheckMirrorResponse.Close();
+                    checkMirrorResponse.Close();
                 }
 
-                if (AvailableMirrors.Count > 0)
+                if (availableMirrors.Count > 0)
                 {
-                    return AvailableMirrors[RandomGenerator.Next(0, AvailableMirrors.Count)];
+                    return availableMirrors[randomGenerator.Next(0, availableMirrors.Count)];
                 }
                 throw new ApplicationException("No mirrors available.");
             }
@@ -106,25 +106,25 @@ namespace Updater.Utilities
         {
             try
             {
-                var AvailableMirrors = new List<String>();
-                var RandomGenerator = new Random();
+                var availableMirrors = new List<String>();
+                var randomGenerator = new Random();
 
-                foreach (var HttpMirror in pHttpMirrorList)
+                foreach (var httpMirror in pHttpMirrorList)
                 {
-                    var CheckMirrorRequest = (HttpWebRequest)WebRequest.Create(HttpMirror);
-                    var CheckMirrorResponse = (HttpWebResponse)CheckMirrorRequest.GetResponse();
+                    var checkMirrorRequest = (HttpWebRequest)WebRequest.Create(httpMirror);
+                    var checkMirrorResponse = (HttpWebResponse)checkMirrorRequest.GetResponse();
 
-                    if (CheckMirrorResponse.StatusCode == HttpStatusCode.OK)
+                    if (checkMirrorResponse.StatusCode == HttpStatusCode.OK)
                     {
-                        AvailableMirrors.Add(HttpMirror);
+                        availableMirrors.Add(httpMirror);
                     }
 
-                    CheckMirrorResponse.Close();
+                    checkMirrorResponse.Close();
                 }
 
-                if (AvailableMirrors.Count > 0)
+                if (availableMirrors.Count > 0)
                 {
-                    return AvailableMirrors[RandomGenerator.Next(0, AvailableMirrors.Count)];
+                    return availableMirrors[randomGenerator.Next(0, availableMirrors.Count)];
                 }
                 throw new ApplicationException("No mirrors available.");
             }

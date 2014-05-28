@@ -25,7 +25,7 @@ namespace Updater.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ftp://arma2.wogames.info/test_appmanifest.xml")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ftp://arma2.wogames.info/ARMA2/Utilities/WOG_Launcher/Resources/AppManifest.xml")]
         public string RemoteManifest {
             get {
                 return ((string)(this["RemoteManifest"]));
@@ -34,7 +34,7 @@ namespace Updater.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\Resources\\AppManifest.xml")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources\\AppManifest.xml")]
         public string LocalManifest {
             get {
                 return ((string)(this["LocalManifest"]));
@@ -43,7 +43,7 @@ namespace Updater.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\Client\\Client.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Client.exe")]
         public string UpdateClientExecutablePath {
             get {
                 return ((string)(this["UpdateClientExecutablePath"]));

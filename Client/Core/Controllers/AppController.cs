@@ -459,8 +459,15 @@ namespace Client.Core.Controllers
 
                 // File deletion
                 // Order a lot of file deletions and wait for them to complete.
-                var deleteTasks = (from entry in CurrentServer.FileList where Directory.Exists(entry) || File.Exists(entry) select FileUtilities.DeleteFile(entry)).ToList();
-                await Task.WhenAll(deleteTasks);
+                List<Task> DeleteTasks = new List<Task>();
+                foreach (String Entry in CurrentServer.FileList)
+                {
+                    if (Directory.Exists(Entry) || File.Exists(Entry))
+                    {
+                        DeleteTasks.Add(FileUtilities.DeleteFile(Entry));
+                    }
+                }
+                await Task.WhenAll(DeleteTasks);
 
                 // Re-check all of the addons (just to be sure).
                 await CheckAddons();

@@ -8,10 +8,10 @@ namespace Updater.Classes
     public class ApplicationFile
     {
         /* Fields */
-        public Guid ID { get; set; }
+        public Guid Id { get; set; }
         public String Path { get; set; }
         public Int32 Version { get; set; }
-        public List<String> URL { get; set; }
+        public List<String> Url { get; set; }
         public FileType Type { get; set; }
     }
 }

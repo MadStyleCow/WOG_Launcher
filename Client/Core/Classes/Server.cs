@@ -99,7 +99,7 @@ namespace Client.Core.Classes
         public async Task<List<String>> GetFileDeleteList()
         {
             // Set base directory
-            Directory.SetCurrentDirectory(LocalMachine.Instance.GetBaseDirectory(Type));
+            Directory.SetCurrentDirectory(LocalMachine.Instance.GetModDirectory(Type));
 
             // Prepare
             var fileSystemEntries = new List<string>();

@@ -28,11 +28,11 @@
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
                     <Grid Margin="0" Grid.RowSpan="5" Grid.ColumnSpan="3"/>
-                    <Button Content="Browse" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
-                    <Button Content="Browse" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
-                    <Button Content="Browse" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
-                    <Button Content="Browse" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
-                    <Button Content="Browse" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
+                    <Button x:Name="eSteamButton" Content="Browse" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
+                    <Button x:Name="eA2Button" Content="Browse" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
+                    <Button x:Name="eA2OAButton" Content="Browse" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
+                    <Button x:Name="eA2OABetaButton" Content="Browse" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
+                    <Button x:Name="eA3Button" Content="Browse" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayFileSelectBox"/>
                     <Label Grid.Row="0" Grid.Column="0" Content="Steam" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
                     <Label Content="ArmA 2" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
                     <Label Content="ArmA 2 OA" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
@@ -64,9 +64,9 @@
                     <TextBox x:Name="EArma2Mod" Grid.Column="1" Grid.Row="0" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
                     <TextBox x:Name="EArma2OaMod" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
                     <TextBox x:Name="EArma3Mod" Grid.Column="1" Grid.Row="2" Margin="5,0,5,0" VerticalAlignment="Center" Height="20"/>
-                    <Button Content="Browse" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
-                    <Button Content="Browse" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
-                    <Button Content="Browse" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
+                    <Button x:Name="eA2ModButton" Content="Browse" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
+                    <Button x:Name="eA2OAModButton" Content="Browse" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
+                    <Button x:Name="eA3ModButton" Content="Browse" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Click="DisplayDirectorySelectBox"/>
                 </Grid>
             </TabItem>
         </TabControl>
