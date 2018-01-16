@@ -53,33 +53,40 @@ namespace Client.Core.Utilities
 
                 foreach (var remoteFile in remoteManifest.ApplicationFileList.FindAll(p => p.Type.Equals(FileType.Updater)))
                 {
+                    // Create a full path for the file
+                    string _globalFilePath = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + remoteFile.Path);
+
                     if (localManifest.ApplicationFileList.Any(p => p.Id.Equals(remoteFile.Id)))
                     {
                         var localFile = localManifest.ApplicationFileList.Find(p => p.Id.Equals(remoteFile.Id));
 
-                        if (File.Exists(remoteFile.Path))
+                        if (File.Exists(_globalFilePath))
                         {
                             if (!remoteFile.Version.Equals(localFile.Version))
                             {
-                                await FileUtilities.DeleteFile(localFile.Path);
-                                await NetworkUtilities.DownloadToFile(NetworkUtilities.GetMirror(remoteFile.Url).Result, remoteFile.Path);
+                                FileUtilities.DeleteFile(_globalFilePath);
+                                NetworkUtilities.DownloadToFile(NetworkUtilities.GetMirror(remoteFile.Url), _globalFilePath);
                             }
                         }
                         else
                         {
-                            await NetworkUtilities.DownloadToFile(NetworkUtilities.GetMirror(remoteFile.Url).Result, remoteFile.Path);
+                            // This works with relative paths, however in order to check the file-size
+                            // We need to have the full file file path
+                            NetworkUtilities.DownloadToFile(NetworkUtilities.GetMirror(remoteFile.Url), _globalFilePath);
                         }
                     }
                     else
                     {
-                        await NetworkUtilities.DownloadToFile(NetworkUtilities.GetMirror(remoteFile.Url).Result, remoteFile.Path);
+                        // This works with relative paths, however in order to check the file-size
+                        // We need to have the full file file path
+                        NetworkUtilities.DownloadToFile(NetworkUtilities.GetMirror(remoteFile.Url), _globalFilePath);
                     }
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error("An error was encountered while trying to update the application.", ex);
-                throw;
+                throw ex;
             }
         }
     }

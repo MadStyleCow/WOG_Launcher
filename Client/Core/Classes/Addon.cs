@@ -80,7 +80,7 @@ namespace Client.Core.Classes
 
             try
             {
-                if (await NetworkUtilities.DownloadToFile(String.Format("{0}/{1}", pBaseUrl, RelativeUrl), temporaryFile))
+                if (NetworkUtilities.DownloadToFile(String.Format("{0}/{1}", pBaseUrl, RelativeUrl), temporaryFile))
                 {
                     await FileUtilities.ExtractArchive(temporaryFile, Name, String.Format("{0}\\{1}", RelativePath, Name));
                     return true;

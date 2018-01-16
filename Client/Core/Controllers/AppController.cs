@@ -200,7 +200,7 @@ namespace Client.Core.Controllers
                     // All's not well
                     // Display update frame
                     SetApplicationState(AppState.Check);
-                    SetBrowserTarget(NetworkUtilities.GetMirror(CurrentServer.ChangelogUrlList).Result);
+                    SetBrowserTarget(NetworkUtilities.GetMirror(CurrentServer.ChangelogUrlList));
                 }
             }
             catch(Exception ex)
@@ -351,8 +351,7 @@ namespace Client.Core.Controllers
                     // Receive manifests if needed.
                     if (CurrentServer.BaseManifestUrl == null)
                     {
-                        CurrentServer.BaseManifestUrl =
-                            await NetworkUtilities.GetMirror(CurrentServer.ManifestUrlList);
+                        CurrentServer.BaseManifestUrl = NetworkUtilities.GetMirror(CurrentServer.ManifestUrlList);
                         await CurrentServer.GetData(CurrentServer.BaseManifestUrl);
                     }
 
@@ -436,7 +435,7 @@ namespace Client.Core.Controllers
                     {
 
                         // Get a new base manifest URL
-                        String newBaseManifestUrl = NetworkUtilities.GetMirror(CurrentServer.ManifestUrlList).Result;
+                        String newBaseManifestUrl = NetworkUtilities.GetMirror(CurrentServer.ManifestUrlList);
                         CurrentServer.BaseManifestUrl = newBaseManifestUrl;
 
                         // Repeat

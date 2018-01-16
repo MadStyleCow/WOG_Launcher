@@ -43,11 +43,11 @@ namespace Client.Core.Classes
             try
             {
                 // Download files
-                await NetworkUtilities.DownloadToFile(pManifestUrl, serverManifestTemp);
+                NetworkUtilities.DownloadToFile(pManifestUrl, serverManifestTemp);
 
                 // Extract files
-                await FileUtilities.ExtractArchive(serverManifestTemp, @"addons/Addons.xml", serverAddonListTemp);
-                await FileUtilities.ExtractArchive(serverManifestTemp, @"addons/Mods.xml", serverModListTemp);
+                FileUtilities.ExtractArchive(serverManifestTemp, @"addons/Addons.xml", serverAddonListTemp);
+                FileUtilities.ExtractArchive(serverManifestTemp, @"addons/Mods.xml", serverModListTemp);
 
                 // Serialize them
                 var dsAddonServer = new DSServer
