@@ -294,6 +294,7 @@ namespace Client.Core.Controllers
                 // Pre-load the server list.
                 var serverListTask = GetServerList(Settings.Default.RemoteServerManifest);
 
+                #if !DEBUG
                 // Check for updates to the application itself.
                 if(await ApplicationUpdater.UpdatesRequired(Settings.Default.RemoteAppManfest, Settings.Default.LocalAppManifest))
                 {
@@ -309,7 +310,8 @@ namespace Client.Core.Controllers
                     // Close the application.
                     Environment.Exit(0);
                 }
-                
+                #endif
+
                 // Set the server list.
                 SetServerList(await serverListTask);
             }

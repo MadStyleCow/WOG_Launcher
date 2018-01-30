@@ -34,7 +34,7 @@ namespace Client.Core.Utilities
                 DriveInfo _tempDrive = new DriveInfo(pOutputPath.Substring(0, 1));
 
                 // Request the size of the file
-                FtpWebRequest _sizeRequest = (FtpWebRequest) WebRequest.Create(pInputUrl);
+                FtpWebRequest _sizeRequest = (FtpWebRequest)WebRequest.Create(pInputUrl);
 
                 // Set params
                 _sizeRequest.Method = WebRequestMethods.Ftp.GetFileSize;
@@ -42,7 +42,7 @@ namespace Client.Core.Utilities
                 _sizeRequest.UseBinary = true;
 
                 // Execute
-                FtpWebResponse _sizeResponse = (FtpWebResponse) _sizeRequest.GetResponse();
+                FtpWebResponse _sizeResponse = (FtpWebResponse)_sizeRequest.GetResponse();
 
                 // Is it enough?
                 if (_sizeResponse.StatusCode == FtpStatusCode.FileStatus)
@@ -51,10 +51,6 @@ namespace Client.Core.Utilities
                     {
                         throw new IOException("Not enough free space in TEMP folder.");
                     }
-                }
-                else
-                {
-                    throw new WebException("File unavailable or incorrect URL schema.");
                 }
 
                 // Close the response
@@ -72,7 +68,7 @@ namespace Client.Core.Utilities
                 // And if we are still here - return false
                 return false;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }

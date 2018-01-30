@@ -1,5 +1,4 @@
-﻿
-namespace Client.Core.Enums
+﻿namespace Client.Core.Enums
 {
     public enum GameType
     {
