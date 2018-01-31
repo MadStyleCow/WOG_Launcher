@@ -15,6 +15,7 @@ namespace Client.Core.Classes
         /* Fields */
         public Guid IdKey;
         public GameType Type;
+        public RepositoryType RepositoryType;
         public String Name;
         public Int32 ThreadCount;
         public List<String> ManifestUrlList;

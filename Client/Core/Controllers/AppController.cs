@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Client.Core.Classes;
+using Client.Core.Classes.A3Sync;
 using Client.Core.Enums;
 using Client.Core.Utilities;
 using Client.Core.Utilities.Classes;
@@ -291,6 +292,11 @@ namespace Client.Core.Controllers
         {
             try
             {
+                var syncJson = JSONSerializer.DeserializeFromFile(@"C:\Users\moroz\Desktop\JSON\WOG\sync.json", typeof(A3S_AddonTreeLeaf));
+                var autoconfigJson = JSONSerializer.DeserializeFromFile(@"C:\Users\moroz\Desktop\JSON\WOG\autoconfig.json", typeof(A3S_Autoconfig));
+                var changeLogJson = JSONSerializer.DeserializeFromFile(@"C:\Users\moroz\Desktop\JSON\WOG\changelogs.json", typeof(A3S_Changelog));
+                var serverInfo = JSONSerializer.DeserializeFromFile(@"C:\Users\moroz\Desktop\JSON\WOG\serverInfo.json", typeof(A3S_ServerInfo));
+
                 // Pre-load the server list.
                 var serverListTask = GetServerList(Settings.Default.RemoteServerManifest);
 

@@ -121,7 +121,6 @@ namespace Client.Core.Utilities
             try
             {
                 // Set the directory
-// ReSharper disable once AssignNullToNotNullAttribute
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
                 // Write the file.
